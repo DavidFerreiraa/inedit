@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/server/better-auth";
 import { getSession } from "@/server/better-auth/server";
 import { env } from "@/env";
+import { authClient } from "@/server/better-auth/client";
 
 export default async function Home() {
 	const session = await getSession();
@@ -50,16 +51,14 @@ export default async function Home() {
 									className="rounded-full bg-white/10 px-10 py-3 font-semibold no-underline transition hover:bg-white/20"
 									formAction={async () => {
 										"use server";
-										const res = await auth.api.signInSocial({
-											body: {
-												provider: "github",
-												callbackURL: `${env.BASE_URL}/api/auth/callback/github`,
-											},
+										const res = await authClient.signIn.social({
+											provider: "github",
+											callbackURL: `${env.BASE_URL}/api/auth/callback/github`,
 										});
-										if (!res.url) {
+										if (!res.data?.url) {
 											throw new Error("No URL returned from signInSocial");
 										}
-										redirect(res.url);
+										redirect(res.data.url);
 									}}
 									type="submit"
 								>
