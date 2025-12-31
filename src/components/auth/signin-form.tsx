@@ -1,6 +1,7 @@
 "use client";
 
 import { Github } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { z } from "zod";
@@ -85,43 +86,53 @@ export function SignInForm() {
 	};
 
 	return (
-		<div className="space-y-4">
-			<form className="space-y-3" onSubmit={handleEmailSignIn}>
+		<div className="space-y-6">
+			<form className="space-y-6" onSubmit={handleEmailSignIn}>
 				{globalError && (
-					<div className="rounded-md bg-destructive/10 p-3 text-destructive text-sm">
+					<div className="rounded-md bg-destructive/10 p-4 text-destructive text-sm">
 						{globalError}
 					</div>
 				)}
 
-				<div className="space-y-2">
-					<Label htmlFor="email">Email</Label>
-					<Input
-						className={errors.email ? "border-destructive" : ""}
-						disabled={isLoading}
-						id="email"
-						onChange={(e) => setEmail(e.target.value)}
-						placeholder="you@example.com"
-						type="email"
-						value={email}
-					/>
-					{errors.email && (
-						<p className="text-destructive text-sm">{errors.email}</p>
-					)}
-				</div>
+				<div className="space-y-4">
+					<div className="space-y-2">
+						<Label htmlFor="email">Email</Label>
+						<Input
+							aria-describedby={errors.email ? "email-error" : undefined}
+							aria-invalid={!!errors.email}
+							className={errors.email ? "border-destructive" : ""}
+							disabled={isLoading}
+							id="email"
+							onChange={(e) => setEmail(e.target.value)}
+							placeholder="you@example.com"
+							type="email"
+							value={email}
+						/>
+						{errors.email && (
+							<p className="mt-1 text-destructive text-sm" id="email-error">
+								{errors.email}
+							</p>
+						)}
+					</div>
 
-				<div className="space-y-2">
-					<Label htmlFor="password">Password</Label>
-					<Input
-						className={errors.password ? "border-destructive" : ""}
-						disabled={isLoading}
-						id="password"
-						onChange={(e) => setPassword(e.target.value)}
-						type="password"
-						value={password}
-					/>
-					{errors.password && (
-						<p className="text-destructive text-sm">{errors.password}</p>
-					)}
+					<div className="space-y-2">
+						<Label htmlFor="password">Password</Label>
+						<Input
+							aria-describedby={errors.password ? "password-error" : undefined}
+							aria-invalid={!!errors.password}
+							className={errors.password ? "border-destructive" : ""}
+							disabled={isLoading}
+							id="password"
+							onChange={(e) => setPassword(e.target.value)}
+							type="password"
+							value={password}
+						/>
+						{errors.password && (
+							<p className="mt-1 text-destructive text-sm" id="password-error">
+								{errors.password}
+							</p>
+						)}
+					</div>
 				</div>
 
 				<Button className="w-full" disabled={isLoading} type="submit">
@@ -140,7 +151,7 @@ export function SignInForm() {
 				</div>
 			</div>
 
-			<div className="grid grid-cols-2 gap-3">
+			<div className="grid grid-cols-2 gap-4">
 				<Button
 					disabled={isLoading}
 					onClick={() => handleSocialSignIn("google")}
@@ -174,6 +185,16 @@ export function SignInForm() {
 					<Github className="mr-2 h-4 w-4" />
 					GitHub
 				</Button>
+			</div>
+
+			<div className="text-center text-sm">
+				<span className="text-muted-foreground">Don't have an account? </span>
+				<Link
+					className="font-medium text-primary hover:underline"
+					href="/auth/signup"
+				>
+					Sign up
+				</Link>
 			</div>
 		</div>
 	);
