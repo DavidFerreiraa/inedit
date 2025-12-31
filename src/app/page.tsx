@@ -1,5 +1,14 @@
+import { AppHeader } from "@/components/header";
+
 export default async function Home() {
 	return (
-		<main className="flex min-h-screen flex-col items-center justify-center bg-linear-to-b from-[#2e026d] to-[#15162c] text-white"></main>
+		<>
+			<AppHeader />
+			<main className="min-h-screen bg-zinc-100 pt-14">
+				<div className="container px-4 py-8 md:px-6">
+					{/* Future content */}
+				</div>
+			</main>
+		</>
 	);
 }
