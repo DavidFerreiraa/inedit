@@ -1,7 +1,7 @@
 import { betterAuth, type CookieOptions } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { db } from "@/server/db";
 import { env } from "@/env";
+import { db } from "@/server/db";
 
 // Environment-aware cookie configuration
 // Development (HTTP localhost): secure: false, sameSite: lax
@@ -33,6 +33,10 @@ export const auth = betterAuth({
 		github: {
 			clientId: env.BETTER_AUTH_GITHUB_CLIENT_ID,
 			clientSecret: env.BETTER_AUTH_GITHUB_CLIENT_SECRET,
+		},
+		google: {
+			clientId: env.BETTER_AUTH_GOOGLE_CLIENT_ID,
+			clientSecret: env.BETTER_AUTH_GOOGLE_CLIENT_SECRET,
 		},
 	},
 	advanced: {
