@@ -46,15 +46,19 @@ export function SignInForm() {
 		}
 
 		try {
-			await authClient.signIn.email({
-				email,
-				password,
-				callbackURL: "/",
-			});
-			router.push("/");
+			await authClient.signIn.email(
+				{
+					email,
+					password,
+				},
+				{
+					onSuccess: () => {
+						router.push("/");
+					},
+				},
+			);
 		} catch (error) {
 			setGlobalError(error instanceof Error ? error.message : "Sign in failed");
-		} finally {
 			setIsLoading(false);
 		}
 	};
@@ -64,10 +68,16 @@ export function SignInForm() {
 		setGlobalError("");
 
 		try {
-			await authClient.signIn.social({
-				provider,
-				callbackURL: "/",
-			});
+			await authClient.signIn.social(
+				{
+					provider,
+				},
+				{
+					onSuccess: () => {
+						router.push("/");
+					},
+				},
+			);
 		} catch (_error) {
 			setGlobalError(`${provider} sign-in failed`);
 			setIsLoading(false);
@@ -124,7 +134,7 @@ export function SignInForm() {
 					<Separator />
 				</div>
 				<div className="relative flex justify-center text-xs uppercase">
-					<span className="bg-background px-2 text-muted-foreground">
+					<span className="bg-card px-2 text-muted-foreground">
 						Or continue with
 					</span>
 				</div>
