@@ -155,6 +155,10 @@ When working on specific aspects of the project, delegate to specialized subagen
 - **drizzle-neon-expert**: Drizzle ORM, Neon PostgreSQL, migrations, schema design
 - **shadcn-ui-expert**: shadcn/ui components, Radix UI, accessibility, design system
 - **biome-typescript-expert**: Code quality, Biome linting, TypeScript strict mode
+- **apple-ui-designer**: UI/UX design guidance following Apple's minimalist design philosophy
+  - Use for: Design feedback, spacing/typography decisions, component design
+  - Invoked proactively after UI implementations or when design decisions are needed
+  - Applies Apple's 8-point grid system, typography scales, and minimalist principles
 
 ### MCP Servers Available
 

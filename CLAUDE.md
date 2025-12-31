@@ -204,6 +204,14 @@ This project uses **pnpm 10.27.0** as specified in `package.json`. Always use `p
 3. **Responsive Design**: Mobile-first approach with Tailwind breakpoints
 4. **Dark Mode**: (Not yet implemented - ready for configuration)
 
+### UI/UX Design
+
+1. **Apple Design Philosophy**: Follow minimalist, clean design principles inspired by Apple's design language
+2. **Design Review**: Use the `apple-ui-designer` agent for design feedback on UI components
+3. **Spacing System**: Apply consistent spacing using 8-point grid system (8px, 16px, 24px, 32px, etc.)
+4. **Typography**: Use clear hierarchy with appropriate font sizes and weights
+5. **Proactive Design Checks**: Design agent reviews UI components automatically after implementation
+
 ## Adding shadcn/ui Components
 
 To add new shadcn/ui components:
@@ -238,6 +246,23 @@ Components will be added to `src/components/ui/` and can be customized as needed
 - **Environment validation failed**: Check all required vars in `.env.example` are set
 - **Module not found**: Clear `.next` folder and rebuild: `rm -rf .next && pnpm build`
 
+## Specialized Agents
+
+Claude Code has access to specialized agents for different aspects of the project:
+
+- **apple-ui-designer**: UI/UX design guidance following Apple's minimalist design philosophy
+  - Automatically reviews UI components after implementation
+  - Provides feedback on spacing, typography, colors, and layout
+  - Applies 8-point grid system and Apple's design principles
+
+- **nextjs-app-router-expert**: Next.js 15 App Router patterns and optimization
+- **better-auth-expert**: Better Auth implementation and troubleshooting
+- **drizzle-neon-expert**: Database operations, schema design, and migrations
+- **shadcn-ui-expert**: Component creation with shadcn/ui and Radix UI
+- **biome-typescript-expert**: Code quality, linting, and TypeScript type safety
+
+These agents are invoked automatically when relevant or can be requested explicitly.
+
 ## MCP Servers Available
 
 This project is configured with the following MCP servers for enhanced Claude Code assistance:
@@ -249,4 +274,4 @@ This project is configured with the following MCP servers for enhanced Claude Co
 5. **Sequential Thinking** - Complex problem-solving assistance
 6. **Everything** - General-purpose operations
 
-See `.claude/commands/instructions.md` for MCP usage patterns.
+See [.claude/commands/instructions.md](.claude/commands/instructions.md) for MCP usage patterns.
