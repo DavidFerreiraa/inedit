@@ -33,7 +33,7 @@ export const posts = createTable(
 	],
 );
 
-export const user = pgTable("user", {
+export const user = createTable("user", {
 	id: text("id").primaryKey(),
 	name: text("name").notNull(),
 	email: text("email").notNull().unique(),
@@ -49,7 +49,7 @@ export const user = pgTable("user", {
 		.notNull(),
 });
 
-export const session = pgTable("session", {
+export const session = createTable("session", {
 	id: text("id").primaryKey(),
 	expiresAt: timestamp("expires_at").notNull(),
 	token: text("token").notNull().unique(),
@@ -62,7 +62,7 @@ export const session = pgTable("session", {
 		.references(() => user.id, { onDelete: "cascade" }),
 });
 
-export const account = pgTable("account", {
+export const account = createTable("account", {
 	id: text("id").primaryKey(),
 	accountId: text("account_id").notNull(),
 	providerId: text("provider_id").notNull(),
@@ -80,7 +80,7 @@ export const account = pgTable("account", {
 	updatedAt: timestamp("updated_at").notNull(),
 });
 
-export const verification = pgTable("verification", {
+export const verification = createTable("verification", {
 	id: text("id").primaryKey(),
 	identifier: text("identifier").notNull(),
 	value: text("value").notNull(),
@@ -133,19 +133,21 @@ export const fileProcessingStatusEnum = pgEnum("file_processing_status", [
 // ============================================================================
 
 export const bancas = createTable("banca", (d) => ({
-	id: d.varchar({ length: 50 }).primaryKey(), // e.g., "cebraspe", "fgv"
-	name: d.varchar({ length: 255 }).notNull(), // e.g., "CEBRASPE", "FGV"
-	description: d.text(),
-	logoUrl: d.text(),
+	id: d.varchar("id", { length: 50 }).primaryKey(), // e.g., "cebraspe", "fgv"
+	name: d.varchar("name", { length: 255 }).notNull(), // e.g., "CEBRASPE", "FGV"
+	description: d.text("description"),
+	logoUrl: d.text("logo_url"),
 	isActive: d
-		.boolean()
+		.boolean("is_active")
 		.$defaultFn(() => true)
 		.notNull(),
 	createdAt: d
-		.timestamp({ withTimezone: true })
+		.timestamp("created_at", { withTimezone: true })
 		.$defaultFn(() => new Date())
 		.notNull(),
-	updatedAt: d.timestamp({ withTimezone: true }).$onUpdate(() => new Date()),
+	updatedAt: d
+		.timestamp("updated_at", { withTimezone: true })
+		.$onUpdate(() => new Date()),
 }));
 
 // ============================================================================
