@@ -102,6 +102,7 @@ export async function POST(
 			// Upload to Vercel Blob
 			const blob = await put(file.name, file, {
 				access: "public",
+				addRandomSuffix: true,
 			});
 
 			// Create source record
