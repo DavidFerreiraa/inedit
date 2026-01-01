@@ -76,12 +76,20 @@ export function SourceCard({ source, bancaId, onDelete }: SourceCardProps) {
 		? source.content.slice(0, 100) + (source.content.length > 100 ? "..." : "")
 		: source.url || source.fileName || "No preview available";
 
+	const isPending =
+		source.processingStatus === "pending" ||
+		source.processingStatus === "processing";
+
 	return (
 		<div className="group relative rounded-lg border bg-card p-4 transition-shadow hover:shadow-md">
 			<div className="flex items-start gap-3">
 				{/* Icon */}
 				<div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-					<Icon className="size-5 text-primary" />
+					{isPending ? (
+						<Loader2 className="size-5 animate-spin text-primary" />
+					) : (
+						<Icon className="size-5 text-primary" />
+					)}
 				</div>
 
 				{/* Content */}
@@ -110,11 +118,12 @@ export function SourceCard({ source, bancaId, onDelete }: SourceCardProps) {
 					<div className="flex items-center gap-2">
 						<Badge
 							className={cn(
-								"text-xs capitalize",
+								"flex items-center gap-1.5 text-xs capitalize",
 								statusColors[source.processingStatus],
 							)}
 							variant="outline"
 						>
+							{isPending && <Loader2 className="size-3 animate-spin" />}
 							{source.processingStatus}
 						</Badge>
 						<span className="text-muted-foreground text-xs">

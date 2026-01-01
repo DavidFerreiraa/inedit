@@ -116,7 +116,7 @@ export async function POST(
 				fileName: file.name,
 				fileSize: file.size,
 				mimeType: file.type,
-				processingStatus: "pending",
+				processingStatus: "completed", // TODO: Implement background processing
 				createdAt: new Date(),
 			};
 
@@ -139,7 +139,7 @@ export async function POST(
 			title: validatedData.title,
 			content: validatedData.content,
 			url: validatedData.url,
-			processingStatus: validatedData.type === "text" ? "completed" : "pending",
+			processingStatus: "completed", // TODO: Implement background processing for URLs
 			createdAt: new Date(),
 		};
 
