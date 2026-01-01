@@ -1,0 +1,1287 @@
+{
+	"id": "168facc3-d527-457a-a8c0-b7bee32a8857",
+	"prevId": "00000000-0000-0000-0000-000000000000",
+	"version": "7",
+	"dialect": "postgresql",
+	"tables": {
+		"public.account": {
+			"name": "account",
+			"schema": "",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "text",
+					"primaryKey": true,
+					"notNull": true
+				},
+				"account_id": {
+					"name": "account_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"provider_id": {
+					"name": "provider_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"user_id": {
+					"name": "user_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"access_token": {
+					"name": "access_token",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"refresh_token": {
+					"name": "refresh_token",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"id_token": {
+					"name": "id_token",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"access_token_expires_at": {
+					"name": "access_token_expires_at",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"refresh_token_expires_at": {
+					"name": "refresh_token_expires_at",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"scope": {
+					"name": "scope",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"password": {
+					"name": "password",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"updated_at": {
+					"name": "updated_at",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true
+				}
+			},
+			"indexes": {},
+			"foreignKeys": {
+				"account_user_id_user_id_fk": {
+					"name": "account_user_id_user_id_fk",
+					"tableFrom": "account",
+					"tableTo": "user",
+					"columnsFrom": ["user_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "no action"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {},
+			"policies": {},
+			"checkConstraints": {},
+			"isRLSEnabled": false
+		},
+		"public.pg-drizzle_banca": {
+			"name": "pg-drizzle_banca",
+			"schema": "",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "varchar(50)",
+					"primaryKey": true,
+					"notNull": true
+				},
+				"name": {
+					"name": "name",
+					"type": "varchar(255)",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"description": {
+					"name": "description",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"logoUrl": {
+					"name": "logoUrl",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"isActive": {
+					"name": "isActive",
+					"type": "boolean",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"createdAt": {
+					"name": "createdAt",
+					"type": "timestamp with time zone",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"updatedAt": {
+					"name": "updatedAt",
+					"type": "timestamp with time zone",
+					"primaryKey": false,
+					"notNull": false
+				}
+			},
+			"indexes": {},
+			"foreignKeys": {},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {},
+			"policies": {},
+			"checkConstraints": {},
+			"isRLSEnabled": false
+		},
+		"public.pg-drizzle_bookmark": {
+			"name": "pg-drizzle_bookmark",
+			"schema": "",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "integer",
+					"primaryKey": true,
+					"notNull": true,
+					"identity": {
+						"type": "byDefault",
+						"name": "pg-drizzle_bookmark_id_seq",
+						"schema": "public",
+						"increment": "1",
+						"startWith": "1",
+						"minValue": "1",
+						"maxValue": "2147483647",
+						"cache": "1",
+						"cycle": false
+					}
+				},
+				"userId": {
+					"name": "userId",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"questionId": {
+					"name": "questionId",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"note": {
+					"name": "note",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"createdAt": {
+					"name": "createdAt",
+					"type": "timestamp with time zone",
+					"primaryKey": false,
+					"notNull": true
+				}
+			},
+			"indexes": {
+				"bookmark_user_idx": {
+					"name": "bookmark_user_idx",
+					"columns": [
+						{
+							"expression": "userId",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						}
+					],
+					"isUnique": false,
+					"concurrently": false,
+					"method": "btree",
+					"with": {}
+				},
+				"bookmark_question_idx": {
+					"name": "bookmark_question_idx",
+					"columns": [
+						{
+							"expression": "questionId",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						}
+					],
+					"isUnique": false,
+					"concurrently": false,
+					"method": "btree",
+					"with": {}
+				},
+				"bookmark_user_question_unique_idx": {
+					"name": "bookmark_user_question_unique_idx",
+					"columns": [
+						{
+							"expression": "userId",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						},
+						{
+							"expression": "questionId",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						}
+					],
+					"isUnique": false,
+					"concurrently": false,
+					"method": "btree",
+					"with": {}
+				}
+			},
+			"foreignKeys": {
+				"pg-drizzle_bookmark_userId_user_id_fk": {
+					"name": "pg-drizzle_bookmark_userId_user_id_fk",
+					"tableFrom": "pg-drizzle_bookmark",
+					"tableTo": "user",
+					"columnsFrom": ["userId"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "no action"
+				},
+				"pg-drizzle_bookmark_questionId_pg-drizzle_question_id_fk": {
+					"name": "pg-drizzle_bookmark_questionId_pg-drizzle_question_id_fk",
+					"tableFrom": "pg-drizzle_bookmark",
+					"tableTo": "pg-drizzle_question",
+					"columnsFrom": ["questionId"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "no action"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {},
+			"policies": {},
+			"checkConstraints": {},
+			"isRLSEnabled": false
+		},
+		"public.pg-drizzle_post": {
+			"name": "pg-drizzle_post",
+			"schema": "",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "integer",
+					"primaryKey": true,
+					"notNull": true,
+					"identity": {
+						"type": "byDefault",
+						"name": "pg-drizzle_post_id_seq",
+						"schema": "public",
+						"increment": "1",
+						"startWith": "1",
+						"minValue": "1",
+						"maxValue": "2147483647",
+						"cache": "1",
+						"cycle": false
+					}
+				},
+				"name": {
+					"name": "name",
+					"type": "varchar(256)",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"createdById": {
+					"name": "createdById",
+					"type": "varchar(255)",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"createdAt": {
+					"name": "createdAt",
+					"type": "timestamp with time zone",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"updatedAt": {
+					"name": "updatedAt",
+					"type": "timestamp with time zone",
+					"primaryKey": false,
+					"notNull": false
+				}
+			},
+			"indexes": {
+				"created_by_idx": {
+					"name": "created_by_idx",
+					"columns": [
+						{
+							"expression": "createdById",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						}
+					],
+					"isUnique": false,
+					"concurrently": false,
+					"method": "btree",
+					"with": {}
+				},
+				"name_idx": {
+					"name": "name_idx",
+					"columns": [
+						{
+							"expression": "name",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						}
+					],
+					"isUnique": false,
+					"concurrently": false,
+					"method": "btree",
+					"with": {}
+				}
+			},
+			"foreignKeys": {
+				"pg-drizzle_post_createdById_user_id_fk": {
+					"name": "pg-drizzle_post_createdById_user_id_fk",
+					"tableFrom": "pg-drizzle_post",
+					"tableTo": "user",
+					"columnsFrom": ["createdById"],
+					"columnsTo": ["id"],
+					"onDelete": "no action",
+					"onUpdate": "no action"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {},
+			"policies": {},
+			"checkConstraints": {},
+			"isRLSEnabled": false
+		},
+		"public.pg-drizzle_question_option": {
+			"name": "pg-drizzle_question_option",
+			"schema": "",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "integer",
+					"primaryKey": true,
+					"notNull": true,
+					"identity": {
+						"type": "byDefault",
+						"name": "pg-drizzle_question_option_id_seq",
+						"schema": "public",
+						"increment": "1",
+						"startWith": "1",
+						"minValue": "1",
+						"maxValue": "2147483647",
+						"cache": "1",
+						"cycle": false
+					}
+				},
+				"questionId": {
+					"name": "questionId",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"label": {
+					"name": "label",
+					"type": "varchar(50)",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"isCorrect": {
+					"name": "isCorrect",
+					"type": "boolean",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"displayOrder": {
+					"name": "displayOrder",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"createdAt": {
+					"name": "createdAt",
+					"type": "timestamp with time zone",
+					"primaryKey": false,
+					"notNull": true
+				}
+			},
+			"indexes": {
+				"question_option_question_idx": {
+					"name": "question_option_question_idx",
+					"columns": [
+						{
+							"expression": "questionId",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						}
+					],
+					"isUnique": false,
+					"concurrently": false,
+					"method": "btree",
+					"with": {}
+				},
+				"question_option_display_order_idx": {
+					"name": "question_option_display_order_idx",
+					"columns": [
+						{
+							"expression": "displayOrder",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						}
+					],
+					"isUnique": false,
+					"concurrently": false,
+					"method": "btree",
+					"with": {}
+				}
+			},
+			"foreignKeys": {
+				"pg-drizzle_question_option_questionId_pg-drizzle_question_id_fk": {
+					"name": "pg-drizzle_question_option_questionId_pg-drizzle_question_id_fk",
+					"tableFrom": "pg-drizzle_question_option",
+					"tableTo": "pg-drizzle_question",
+					"columnsFrom": ["questionId"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "no action"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {},
+			"policies": {},
+			"checkConstraints": {},
+			"isRLSEnabled": false
+		},
+		"public.pg-drizzle_question": {
+			"name": "pg-drizzle_question",
+			"schema": "",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "integer",
+					"primaryKey": true,
+					"notNull": true,
+					"identity": {
+						"type": "byDefault",
+						"name": "pg-drizzle_question_id_seq",
+						"schema": "public",
+						"increment": "1",
+						"startWith": "1",
+						"minValue": "1",
+						"maxValue": "2147483647",
+						"cache": "1",
+						"cycle": false
+					}
+				},
+				"userId": {
+					"name": "userId",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"bancaId": {
+					"name": "bancaId",
+					"type": "varchar(50)",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"title": {
+					"name": "title",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"description": {
+					"name": "description",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"difficulty": {
+					"name": "difficulty",
+					"type": "difficulty",
+					"typeSchema": "public",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"status": {
+					"name": "status",
+					"type": "question_status",
+					"typeSchema": "public",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"tags": {
+					"name": "tags",
+					"type": "jsonb",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"generatedFromSourceIds": {
+					"name": "generatedFromSourceIds",
+					"type": "jsonb",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"aiPrompt": {
+					"name": "aiPrompt",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"aiModel": {
+					"name": "aiModel",
+					"type": "varchar(100)",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"aiTokensUsed": {
+					"name": "aiTokensUsed",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"explanation": {
+					"name": "explanation",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"timesAnswered": {
+					"name": "timesAnswered",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"correctAnswerRate": {
+					"name": "correctAnswerRate",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"createdAt": {
+					"name": "createdAt",
+					"type": "timestamp with time zone",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"updatedAt": {
+					"name": "updatedAt",
+					"type": "timestamp with time zone",
+					"primaryKey": false,
+					"notNull": false
+				}
+			},
+			"indexes": {
+				"question_user_idx": {
+					"name": "question_user_idx",
+					"columns": [
+						{
+							"expression": "userId",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						}
+					],
+					"isUnique": false,
+					"concurrently": false,
+					"method": "btree",
+					"with": {}
+				},
+				"question_banca_idx": {
+					"name": "question_banca_idx",
+					"columns": [
+						{
+							"expression": "bancaId",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						}
+					],
+					"isUnique": false,
+					"concurrently": false,
+					"method": "btree",
+					"with": {}
+				},
+				"question_difficulty_idx": {
+					"name": "question_difficulty_idx",
+					"columns": [
+						{
+							"expression": "difficulty",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						}
+					],
+					"isUnique": false,
+					"concurrently": false,
+					"method": "btree",
+					"with": {}
+				},
+				"question_status_idx": {
+					"name": "question_status_idx",
+					"columns": [
+						{
+							"expression": "status",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						}
+					],
+					"isUnique": false,
+					"concurrently": false,
+					"method": "btree",
+					"with": {}
+				},
+				"question_created_at_idx": {
+					"name": "question_created_at_idx",
+					"columns": [
+						{
+							"expression": "createdAt",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						}
+					],
+					"isUnique": false,
+					"concurrently": false,
+					"method": "btree",
+					"with": {}
+				}
+			},
+			"foreignKeys": {
+				"pg-drizzle_question_userId_user_id_fk": {
+					"name": "pg-drizzle_question_userId_user_id_fk",
+					"tableFrom": "pg-drizzle_question",
+					"tableTo": "user",
+					"columnsFrom": ["userId"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "no action"
+				},
+				"pg-drizzle_question_bancaId_pg-drizzle_banca_id_fk": {
+					"name": "pg-drizzle_question_bancaId_pg-drizzle_banca_id_fk",
+					"tableFrom": "pg-drizzle_question",
+					"tableTo": "pg-drizzle_banca",
+					"columnsFrom": ["bancaId"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "no action"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {},
+			"policies": {},
+			"checkConstraints": {},
+			"isRLSEnabled": false
+		},
+		"public.session": {
+			"name": "session",
+			"schema": "",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "text",
+					"primaryKey": true,
+					"notNull": true
+				},
+				"expires_at": {
+					"name": "expires_at",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"token": {
+					"name": "token",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"updated_at": {
+					"name": "updated_at",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"ip_address": {
+					"name": "ip_address",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"user_agent": {
+					"name": "user_agent",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"user_id": {
+					"name": "user_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true
+				}
+			},
+			"indexes": {},
+			"foreignKeys": {
+				"session_user_id_user_id_fk": {
+					"name": "session_user_id_user_id_fk",
+					"tableFrom": "session",
+					"tableTo": "user",
+					"columnsFrom": ["user_id"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "no action"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {
+				"session_token_unique": {
+					"name": "session_token_unique",
+					"nullsNotDistinct": false,
+					"columns": ["token"]
+				}
+			},
+			"policies": {},
+			"checkConstraints": {},
+			"isRLSEnabled": false
+		},
+		"public.pg-drizzle_source": {
+			"name": "pg-drizzle_source",
+			"schema": "",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "integer",
+					"primaryKey": true,
+					"notNull": true,
+					"identity": {
+						"type": "byDefault",
+						"name": "pg-drizzle_source_id_seq",
+						"schema": "public",
+						"increment": "1",
+						"startWith": "1",
+						"minValue": "1",
+						"maxValue": "2147483647",
+						"cache": "1",
+						"cycle": false
+					}
+				},
+				"userId": {
+					"name": "userId",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"bancaId": {
+					"name": "bancaId",
+					"type": "varchar(50)",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"type": {
+					"name": "type",
+					"type": "source_type",
+					"typeSchema": "public",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"title": {
+					"name": "title",
+					"type": "varchar(500)",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"content": {
+					"name": "content",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"url": {
+					"name": "url",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"blobUrl": {
+					"name": "blobUrl",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"blobKey": {
+					"name": "blobKey",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"fileName": {
+					"name": "fileName",
+					"type": "varchar(500)",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"fileSize": {
+					"name": "fileSize",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"mimeType": {
+					"name": "mimeType",
+					"type": "varchar(100)",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"processingStatus": {
+					"name": "processingStatus",
+					"type": "file_processing_status",
+					"typeSchema": "public",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"processingError": {
+					"name": "processingError",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"processedAt": {
+					"name": "processedAt",
+					"type": "timestamp with time zone",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"extractedText": {
+					"name": "extractedText",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"metadata": {
+					"name": "metadata",
+					"type": "jsonb",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"createdAt": {
+					"name": "createdAt",
+					"type": "timestamp with time zone",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"updatedAt": {
+					"name": "updatedAt",
+					"type": "timestamp with time zone",
+					"primaryKey": false,
+					"notNull": false
+				}
+			},
+			"indexes": {
+				"source_user_idx": {
+					"name": "source_user_idx",
+					"columns": [
+						{
+							"expression": "userId",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						}
+					],
+					"isUnique": false,
+					"concurrently": false,
+					"method": "btree",
+					"with": {}
+				},
+				"source_banca_idx": {
+					"name": "source_banca_idx",
+					"columns": [
+						{
+							"expression": "bancaId",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						}
+					],
+					"isUnique": false,
+					"concurrently": false,
+					"method": "btree",
+					"with": {}
+				},
+				"source_type_idx": {
+					"name": "source_type_idx",
+					"columns": [
+						{
+							"expression": "type",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						}
+					],
+					"isUnique": false,
+					"concurrently": false,
+					"method": "btree",
+					"with": {}
+				},
+				"source_processing_status_idx": {
+					"name": "source_processing_status_idx",
+					"columns": [
+						{
+							"expression": "processingStatus",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						}
+					],
+					"isUnique": false,
+					"concurrently": false,
+					"method": "btree",
+					"with": {}
+				}
+			},
+			"foreignKeys": {
+				"pg-drizzle_source_userId_user_id_fk": {
+					"name": "pg-drizzle_source_userId_user_id_fk",
+					"tableFrom": "pg-drizzle_source",
+					"tableTo": "user",
+					"columnsFrom": ["userId"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "no action"
+				},
+				"pg-drizzle_source_bancaId_pg-drizzle_banca_id_fk": {
+					"name": "pg-drizzle_source_bancaId_pg-drizzle_banca_id_fk",
+					"tableFrom": "pg-drizzle_source",
+					"tableTo": "pg-drizzle_banca",
+					"columnsFrom": ["bancaId"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "no action"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {},
+			"policies": {},
+			"checkConstraints": {},
+			"isRLSEnabled": false
+		},
+		"public.user": {
+			"name": "user",
+			"schema": "",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "text",
+					"primaryKey": true,
+					"notNull": true
+				},
+				"name": {
+					"name": "name",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"email": {
+					"name": "email",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"email_verified": {
+					"name": "email_verified",
+					"type": "boolean",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"image": {
+					"name": "image",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"updated_at": {
+					"name": "updated_at",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true
+				}
+			},
+			"indexes": {},
+			"foreignKeys": {},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {
+				"user_email_unique": {
+					"name": "user_email_unique",
+					"nullsNotDistinct": false,
+					"columns": ["email"]
+				}
+			},
+			"policies": {},
+			"checkConstraints": {},
+			"isRLSEnabled": false
+		},
+		"public.pg-drizzle_user_answer": {
+			"name": "pg-drizzle_user_answer",
+			"schema": "",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "integer",
+					"primaryKey": true,
+					"notNull": true,
+					"identity": {
+						"type": "byDefault",
+						"name": "pg-drizzle_user_answer_id_seq",
+						"schema": "public",
+						"increment": "1",
+						"startWith": "1",
+						"minValue": "1",
+						"maxValue": "2147483647",
+						"cache": "1",
+						"cycle": false
+					}
+				},
+				"userId": {
+					"name": "userId",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"questionId": {
+					"name": "questionId",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"selectedOptionId": {
+					"name": "selectedOptionId",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"isCorrect": {
+					"name": "isCorrect",
+					"type": "boolean",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"timeSpentSeconds": {
+					"name": "timeSpentSeconds",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"answeredAt": {
+					"name": "answeredAt",
+					"type": "timestamp with time zone",
+					"primaryKey": false,
+					"notNull": true
+				}
+			},
+			"indexes": {
+				"user_answer_user_idx": {
+					"name": "user_answer_user_idx",
+					"columns": [
+						{
+							"expression": "userId",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						}
+					],
+					"isUnique": false,
+					"concurrently": false,
+					"method": "btree",
+					"with": {}
+				},
+				"user_answer_question_idx": {
+					"name": "user_answer_question_idx",
+					"columns": [
+						{
+							"expression": "questionId",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						}
+					],
+					"isUnique": false,
+					"concurrently": false,
+					"method": "btree",
+					"with": {}
+				},
+				"user_answer_answered_at_idx": {
+					"name": "user_answer_answered_at_idx",
+					"columns": [
+						{
+							"expression": "answeredAt",
+							"isExpression": false,
+							"asc": true,
+							"nulls": "last"
+						}
+					],
+					"isUnique": false,
+					"concurrently": false,
+					"method": "btree",
+					"with": {}
+				}
+			},
+			"foreignKeys": {
+				"pg-drizzle_user_answer_userId_user_id_fk": {
+					"name": "pg-drizzle_user_answer_userId_user_id_fk",
+					"tableFrom": "pg-drizzle_user_answer",
+					"tableTo": "user",
+					"columnsFrom": ["userId"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "no action"
+				},
+				"pg-drizzle_user_answer_questionId_pg-drizzle_question_id_fk": {
+					"name": "pg-drizzle_user_answer_questionId_pg-drizzle_question_id_fk",
+					"tableFrom": "pg-drizzle_user_answer",
+					"tableTo": "pg-drizzle_question",
+					"columnsFrom": ["questionId"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "no action"
+				},
+				"pg-drizzle_user_answer_selectedOptionId_pg-drizzle_question_option_id_fk": {
+					"name": "pg-drizzle_user_answer_selectedOptionId_pg-drizzle_question_option_id_fk",
+					"tableFrom": "pg-drizzle_user_answer",
+					"tableTo": "pg-drizzle_question_option",
+					"columnsFrom": ["selectedOptionId"],
+					"columnsTo": ["id"],
+					"onDelete": "cascade",
+					"onUpdate": "no action"
+				}
+			},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {},
+			"policies": {},
+			"checkConstraints": {},
+			"isRLSEnabled": false
+		},
+		"public.verification": {
+			"name": "verification",
+			"schema": "",
+			"columns": {
+				"id": {
+					"name": "id",
+					"type": "text",
+					"primaryKey": true,
+					"notNull": true
+				},
+				"identifier": {
+					"name": "identifier",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"value": {
+					"name": "value",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"expires_at": {
+					"name": "expires_at",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"created_at": {
+					"name": "created_at",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": false
+				},
+				"updated_at": {
+					"name": "updated_at",
+					"type": "timestamp",
+					"primaryKey": false,
+					"notNull": false
+				}
+			},
+			"indexes": {},
+			"foreignKeys": {},
+			"compositePrimaryKeys": {},
+			"uniqueConstraints": {},
+			"policies": {},
+			"checkConstraints": {},
+			"isRLSEnabled": false
+		}
+	},
+	"enums": {
+		"public.difficulty": {
+			"name": "difficulty",
+			"schema": "public",
+			"values": ["easy", "medium", "hard"]
+		},
+		"public.file_processing_status": {
+			"name": "file_processing_status",
+			"schema": "public",
+			"values": ["pending", "processing", "completed", "failed"]
+		},
+		"public.question_status": {
+			"name": "question_status",
+			"schema": "public",
+			"values": ["draft", "published", "archived"]
+		},
+		"public.source_type": {
+			"name": "source_type",
+			"schema": "public",
+			"values": ["file", "url", "text"]
+		}
+	},
+	"schemas": {},
+	"sequences": {},
+	"roles": {},
+	"policies": {},
+	"views": {},
+	"_meta": {
+		"columns": {},
+		"schemas": {},
+		"tables": {}
+	}
+}
