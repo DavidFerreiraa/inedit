@@ -8,7 +8,7 @@ import {
 	CommandItem,
 	CommandList,
 } from "@/components/ui/command";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 
 interface SearchModalProps {
 	open: boolean;
@@ -19,6 +19,7 @@ export function SearchModal({ open, onOpenChange }: SearchModalProps) {
 	return (
 		<Dialog onOpenChange={onOpenChange} open={open}>
 			<DialogContent className="max-w-2xl overflow-hidden p-0">
+				<DialogTitle className="hidden">Search</DialogTitle>
 				<Command className="rounded-lg border-0 bg-zinc-100">
 					<CommandInput placeholder="Search..." />
 					<CommandList>
