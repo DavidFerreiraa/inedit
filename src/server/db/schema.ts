@@ -246,7 +246,7 @@ export const questions = createTable(
 		aiPrompt: d.text(), // Store the prompt used for generation
 		aiModel: d
 			.varchar({ length: 100 })
-			.$defaultFn(() => "claude-3-5-sonnet-20241022"),
+			.$defaultFn(() => "claude-sonnet-4-20250514"),
 		aiTokensUsed: d.integer(),
 
 		// Question explanation

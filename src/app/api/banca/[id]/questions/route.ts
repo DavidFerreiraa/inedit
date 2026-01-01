@@ -202,7 +202,7 @@ Format your response as a JSON array of questions with this structure:
 Generate exactly ${validatedData.count} questions.`;
 
 		const message = await anthropic.messages.create({
-			model: "claude-3-5-sonnet-20241022",
+			model: "claude-sonnet-4-20250514",
 			max_tokens: 8192,
 			messages: [
 				{
@@ -244,7 +244,7 @@ Generate exactly ${validatedData.count} questions.`;
 					tags: q.tags,
 					generatedFromSourceIds: validatedData.sourceIds,
 					aiPrompt: prompt,
-					aiModel: "claude-3-5-sonnet-20241022",
+					aiModel: "claude-sonnet-4-20250514",
 					aiTokensUsed:
 						message.usage.input_tokens + message.usage.output_tokens,
 					explanation: q.explanation,
