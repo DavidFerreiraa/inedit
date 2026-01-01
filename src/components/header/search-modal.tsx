@@ -20,7 +20,7 @@ export function SearchModal({ open, onOpenChange }: SearchModalProps) {
 		<Dialog onOpenChange={onOpenChange} open={open}>
 			<DialogContent className="max-w-2xl overflow-hidden p-0">
 				<DialogTitle className="hidden">Search</DialogTitle>
-				<Command className="rounded-lg border-0 bg-zinc-100">
+				<Command className="rounded-lg border-0">
 					<CommandInput placeholder="Search..." />
 					<CommandList>
 						<CommandEmpty>No results found.</CommandEmpty>

@@ -50,10 +50,8 @@ export function QuestionNavigation({
 			{/* Progress Bar */}
 			<div className="space-y-2">
 				<div className="flex items-center justify-between text-sm">
-					<span className="font-medium text-gray-700 dark:text-gray-300">
-						Progresso
-					</span>
-					<span className="text-gray-500 dark:text-gray-400">
+					<span className="font-medium text-foreground">Progresso</span>
+					<span className="text-muted-foreground">
 						{answeredCount} / {totalQuestions} respondidas
 					</span>
 				</div>
@@ -79,13 +77,10 @@ export function QuestionNavigation({
 
 				{/* Question Counter */}
 				<div className="flex items-center gap-2">
-					<div className="rounded-lg bg-gray-100 px-4 py-2 dark:bg-gray-800">
-						<span className="font-semibold text-gray-900 text-sm dark:text-gray-100">
+					<div className="rounded-lg bg-muted px-4 py-2">
+						<span className="font-semibold text-foreground text-sm">
 							<span className="text-lg">{currentIndex + 1}</span>
-							<span className="text-gray-500 dark:text-gray-400">
-								{" "}
-								/ {totalQuestions}
-							</span>
+							<span className="text-muted-foreground"> / {totalQuestions}</span>
 						</span>
 					</div>
 				</div>
@@ -107,17 +102,13 @@ export function QuestionNavigation({
 			</div>
 
 			{/* Keyboard Hints */}
-			<div className="flex items-center justify-center gap-4 text-gray-500 text-xs dark:text-gray-500">
+			<div className="flex items-center justify-center gap-4 text-muted-foreground text-xs">
 				<div className="flex items-center gap-1">
-					<kbd className="rounded bg-gray-100 px-2 py-1 font-mono dark:bg-gray-800">
-						←
-					</kbd>
+					<kbd className="rounded bg-muted px-2 py-1 font-mono">←</kbd>
 					<span>Anterior</span>
 				</div>
 				<div className="flex items-center gap-1">
-					<kbd className="rounded bg-gray-100 px-2 py-1 font-mono dark:bg-gray-800">
-						→
-					</kbd>
+					<kbd className="rounded bg-muted px-2 py-1 font-mono">→</kbd>
 					<span>Próxima</span>
 				</div>
 			</div>

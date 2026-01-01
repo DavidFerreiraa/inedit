@@ -59,7 +59,7 @@ export function UserDropdown({ session }: UserDropdownProps) {
 					</AvatarFallback>
 				</Avatar>
 			</DropdownMenuTrigger>
-			<DropdownMenuContent align="end" className="w-56 bg-zinc-100">
+			<DropdownMenuContent align="end" className="w-56">
 				<DropdownMenuLabel>
 					<div className="flex flex-col space-y-1">
 						<p className="font-medium text-sm">{session.user.name ?? "User"}</p>

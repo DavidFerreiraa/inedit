@@ -93,11 +93,11 @@ export function QuestionCard({
 
 			{/* Question Title */}
 			<div className="space-y-2">
-				<h2 className="font-semibold text-gray-900 text-xl leading-relaxed dark:text-gray-100">
+				<h2 className="font-semibold text-foreground text-xl leading-relaxed">
 					{question.title}
 				</h2>
 				{question.description && (
-					<p className="text-gray-600 text-sm dark:text-gray-400">
+					<p className="text-muted-foreground text-sm">
 						{question.description}
 					</p>
 				)}
@@ -117,8 +117,7 @@ export function QuestionCard({
 								className={cn(
 									"w-full rounded-lg border-2 p-4 text-left transition-all duration-200",
 									"focus:outline-none focus:ring-2 focus:ring-offset-2",
-									!isAnswered &&
-										"border-gray-200 hover:border-gray-300 dark:border-gray-700 dark:hover:border-gray-600",
+									!isAnswered && "border-border hover:border-border/80",
 									!isAnswered &&
 										isSelected &&
 										"border-blue-500 bg-blue-50 dark:bg-blue-950/30",
@@ -144,7 +143,7 @@ export function QuestionCard({
 										<div
 											className={cn(
 												"flex h-5 w-5 items-center justify-center rounded-full border-2",
-												!isAnswered && "border-gray-300 dark:border-gray-600",
+												!isAnswered && "border-border",
 												!isAnswered &&
 													isSelected &&
 													"border-blue-500 bg-blue-500",
@@ -167,7 +166,7 @@ export function QuestionCard({
 										<span
 											className={cn(
 												"font-medium",
-												!isAnswered && "text-gray-900 dark:text-gray-100",
+												!isAnswered && "text-foreground",
 												showCorrect && "text-green-700 dark:text-green-400",
 												showIncorrect && "text-red-700 dark:text-red-400",
 											)}
@@ -219,7 +218,7 @@ export function QuestionCard({
 						</p>
 					</div>
 					{!isCorrect && correctOption && (
-						<p className="mt-2 text-gray-600 text-sm dark:text-gray-400">
+						<p className="mt-2 text-muted-foreground text-sm">
 							A resposta correta é: <strong>{correctOption.label}</strong>
 						</p>
 					)}
@@ -234,13 +233,13 @@ export function QuestionCard({
 					value={showExplanation ? "explanation" : undefined}
 				>
 					<AccordionItem className="border-none" value="explanation">
-						<AccordionTrigger className="rounded-lg bg-gray-50 px-4 py-3 hover:bg-gray-100 dark:bg-gray-800/50 dark:hover:bg-gray-800">
-							<span className="font-medium text-gray-700 text-sm dark:text-gray-300">
+						<AccordionTrigger className="rounded-lg bg-muted px-4 py-3 hover:bg-muted/80">
+							<span className="font-medium text-foreground text-sm">
 								Ver Explicação
 							</span>
 						</AccordionTrigger>
 						<AccordionContent className="px-4 pt-4">
-							<p className="text-gray-700 text-sm leading-relaxed dark:text-gray-300">
+							<p className="text-foreground text-sm leading-relaxed">
 								{question.explanation}
 							</p>
 						</AccordionContent>

@@ -61,7 +61,7 @@ const SHORTCUTS: KeyboardShortcut[] = [
 
 function KeyBadge({ keyText }: { keyText: string }) {
 	return (
-		<kbd className="inline-flex h-7 min-w-7 items-center justify-center rounded border border-gray-300 bg-gray-50 px-2 font-mono font-semibold text-gray-700 text-xs dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300">
+		<kbd className="inline-flex h-7 min-w-7 items-center justify-center rounded border border-border bg-muted px-2 font-mono font-semibold text-foreground text-xs">
 			{keyText}
 		</kbd>
 	);
@@ -114,7 +114,7 @@ export function KeyboardShortcutsDialog() {
 				<div className="space-y-6">
 					{Object.entries(groupedShortcuts).map(([category, shortcuts]) => (
 						<div className="space-y-3" key={category}>
-							<h3 className="font-semibold text-gray-900 text-sm dark:text-gray-100">
+							<h3 className="font-semibold text-foreground text-sm">
 								{category === "Navigation" && "Navegação"}
 								{category === "Actions" && "Ações"}
 								{category === "UI" && "Interface"}
@@ -122,10 +122,10 @@ export function KeyboardShortcutsDialog() {
 							<div className="space-y-2">
 								{shortcuts.map((shortcut) => (
 									<div
-										className="flex items-center justify-between rounded-lg border border-gray-200 bg-gray-50/50 p-3 dark:border-gray-700 dark:bg-gray-800/50"
+										className="flex items-center justify-between rounded-lg border border-border bg-muted/50 p-3"
 										key={`${category}-${shortcut.description}`}
 									>
-										<span className="text-gray-700 text-sm dark:text-gray-300">
+										<span className="text-foreground text-sm">
 											{shortcut.description}
 										</span>
 										<div className="flex items-center gap-1">
@@ -136,7 +136,7 @@ export function KeyboardShortcutsDialog() {
 												>
 													<KeyBadge keyText={key} />
 													{key !== shortcut.keys[shortcut.keys.length - 1] && (
-														<span className="text-gray-400">+</span>
+														<span className="text-muted-foreground">+</span>
 													)}
 												</span>
 											))}

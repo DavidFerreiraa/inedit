@@ -188,14 +188,14 @@ export function QuestionsPanel({ bancaId }: QuestionsPanelProps) {
 	if (questions.length === 0) {
 		return (
 			<div className="flex h-full flex-col items-center justify-center gap-4 p-6 text-center">
-				<div className="rounded-full bg-gray-100 p-4 dark:bg-gray-800">
-					<BookOpen className="h-8 w-8 text-gray-400" />
+				<div className="rounded-full bg-muted p-4">
+					<BookOpen className="h-8 w-8 text-muted-foreground" />
 				</div>
 				<div className="space-y-2">
-					<h3 className="font-semibold text-gray-900 text-lg dark:text-gray-100">
+					<h3 className="font-semibold text-foreground text-lg">
 						Nenhuma questão gerada ainda
 					</h3>
-					<p className="text-gray-600 text-sm dark:text-gray-400">
+					<p className="text-muted-foreground text-sm">
 						Adicione fontes e clique em "Gerar Questões" para começar
 					</p>
 				</div>
@@ -207,9 +207,7 @@ export function QuestionsPanel({ bancaId }: QuestionsPanelProps) {
 		<div className="flex h-full flex-col gap-6 overflow-y-auto p-6">
 			{/* Header */}
 			<div className="flex items-center justify-between">
-				<h2 className="font-bold text-2xl text-gray-900 dark:text-gray-100">
-					Questões
-				</h2>
+				<h2 className="font-bold text-2xl text-foreground">Questões</h2>
 			</div>
 
 			{/* Question Card */}
@@ -233,10 +231,8 @@ export function QuestionsPanel({ bancaId }: QuestionsPanelProps) {
 
 			{/* Keyboard Hint for Explanation */}
 			{selectedAnswerOptionId !== null && currentQuestion?.explanation && (
-				<div className="flex items-center justify-center text-gray-500 text-xs dark:text-gray-500">
-					<kbd className="rounded bg-gray-100 px-2 py-1 font-mono dark:bg-gray-800">
-						Espaço
-					</kbd>
+				<div className="flex items-center justify-center text-muted-foreground text-xs">
+					<kbd className="rounded bg-muted px-2 py-1 font-mono">Espaço</kbd>
 					<span className="ml-2">para mostrar/ocultar explicação</span>
 				</div>
 			)}

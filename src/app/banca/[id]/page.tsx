@@ -32,7 +32,7 @@ export default async function BancaPage({
 	return (
 		<>
 			<AppHeader />
-			<main className="min-h-screen bg-zinc-100 pt-14">
+			<main className="min-h-screen bg-background pt-14">
 				<BancaPageClient bancaId={id} />
 			</main>
 		</>
