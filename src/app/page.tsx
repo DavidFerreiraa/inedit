@@ -1,4 +1,5 @@
 import { AppHeader } from "@/components/header";
+import { BancaSection } from "@/components/home";
 
 export default async function Home() {
 	return (
@@ -6,7 +7,7 @@ export default async function Home() {
 			<AppHeader />
 			<main className="min-h-screen bg-zinc-100 pt-14">
 				<div className="container px-4 py-8 md:px-6">
-					{/* Future content */}
+					<BancaSection />
 				</div>
 			</main>
 		</>
