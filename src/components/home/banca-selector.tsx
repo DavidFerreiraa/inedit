@@ -7,32 +7,31 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-type Banca = {
+type BancaFromDB = {
 	id: string;
 	name: string;
-	logoPath: string;
-	route: string;
-	comingSoon?: boolean;
+	description: string | null;
+	logoUrl: string | null;
+	isActive: boolean;
+	createdAt: Date;
+	updatedAt: Date | null;
 };
 
-const BANCAS: Banca[] = [
-	{
-		id: "cebraspe",
-		name: "CEBRASPE",
-		logoPath: "/CEBRASPE_logo.png",
-		route: "/banca/cebraspe",
-	},
-	{
-		id: "fgv",
-		name: "FGV",
-		logoPath: "/FGV_logo.png",
-		route: "/banca/fgv",
-		comingSoon: true,
-	},
-];
+type BancaSelectorProps = {
+	bancas: BancaFromDB[];
+};
 
-export function BancaSelector() {
+export function BancaSelector({ bancas: bancasFromDB }: BancaSelectorProps) {
 	const [currentPage, setCurrentPage] = useState(0);
+
+	// Transform database bancas to display format
+	const BANCAS = bancasFromDB.map((banca) => ({
+		id: banca.id,
+		name: banca.name,
+		logoPath: banca.logoUrl ?? "",
+		route: `/banca/${banca.id}`,
+		comingSoon: !banca.isActive,
+	}));
 
 	// Calculate items per page based on screen size (simplified for SSR)
 	// With only 2 items, pagination will be hidden on tablet+ (2 cols or more)

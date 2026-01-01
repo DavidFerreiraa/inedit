@@ -1,14 +1,8 @@
 import { redirect } from "next/navigation";
 import { AppHeader } from "@/components/header";
+import { getBancas } from "@/server/actions/bancas";
 import { auth } from "@/server/better-auth/config";
 import { BancaPageClient } from "./page-client";
-
-const BANCAS_CONFIG = {
-	cebraspe: { name: "CEBRASPE", comingSoon: false },
-	fgv: { name: "FGV", comingSoon: true },
-} as const;
-
-type BancaId = keyof typeof BANCAS_CONFIG;
 
 export default async function BancaPage({
 	params,
@@ -16,10 +10,13 @@ export default async function BancaPage({
 	params: Promise<{ id: string }>;
 }) {
 	const { id } = await params;
-	const banca = BANCAS_CONFIG[id as BancaId];
 
-	// Redirect to home if banca doesn't exist or is coming soon
-	if (!banca || banca.comingSoon) {
+	// Fetch banca from database
+	const allBancas = await getBancas();
+	const banca = allBancas.find((b) => b.id === id);
+
+	// Redirect to home if banca doesn't exist or is not active
+	if (!banca || !banca.isActive) {
 		redirect("/");
 	}
 
