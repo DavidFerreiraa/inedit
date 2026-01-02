@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { CheckCircle2, XCircle } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
 	Accordion,
 	AccordionContent,
@@ -52,6 +52,11 @@ export function QuestionCard({
 	const [selectedOption, setSelectedOption] = useState<number | null>(
 		userAnswer ?? null,
 	);
+
+	// Sync local state with userAnswer prop when it changes
+	useEffect(() => {
+		setSelectedOption(userAnswer ?? null);
+	}, [userAnswer]);
 
 	const correctOption = question.options.find((opt) => opt.isCorrect);
 	const isAnswered = selectedOption !== null;
@@ -250,10 +255,10 @@ export function QuestionCard({
 			{/* Confetti Animation on Correct Answer */}
 			{isAnswered && isCorrect && (
 				<motion.div
-					animate={{ scale: [0, 1.2, 1] }}
+					animate={{ scale: [0, 1.2, 1, 1, 1, 1, 0] }}
 					className="pointer-events-none fixed inset-0 flex items-center justify-center"
 					initial={{ scale: 0 }}
-					transition={{ duration: 0.5 }}
+					transition={{ duration: 1 }}
 				>
 					<div className="text-6xl">🎉</div>
 				</motion.div>
