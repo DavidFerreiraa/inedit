@@ -19,14 +19,16 @@ export function BancaPageClient({ bancaId }: BancaPageClientProps) {
 		mutationFn: async ({
 			sourceIds,
 			count = 5,
+			systemPrompt,
 		}: {
 			sourceIds: number[];
 			count?: number;
+			systemPrompt?: string;
 		}) => {
 			const response = await fetch(`/api/banca/${bancaId}/questions`, {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ sourceIds, count }),
+				body: JSON.stringify({ sourceIds, count, systemPrompt }),
 			});
 
 			if (!response.ok) {
@@ -57,23 +59,24 @@ export function BancaPageClient({ bancaId }: BancaPageClientProps) {
 	});
 
 	const handleGenerate = (sourceIds: number[]) => {
-		generateQuestionsMutation.mutate({ sourceIds, count: 5 });
+		// Hardcoded system prompt - edit this value to customize question generation
+		const systemPrompt = `You are an expert question generator for the CEBRASPE exam format.
+			Focus on creating high-quality questions that test deep understanding of the material.
+			Ensure questions are clear, unambiguous, and have definitive correct answers. 
+			Keep the focus on the way that CEBRASPE formats their questions. Your return should be in brazilian portuguese.`;
+
+		generateQuestionsMutation.mutate({ sourceIds, count: 5, systemPrompt });
 	};
 
 	return (
-		<>
-			<ResizableLayout
+		<div className="flex">
+			<SourcesPanel
 				bancaId={bancaId}
-				questionsPanel={<QuestionsPanel bancaId={bancaId} />}
-				sourcesPanel={
-					<SourcesPanel
-						bancaId={bancaId}
-						isGenerating={isGenerating}
-						onGenerate={handleGenerate}
-					/>
-				}
+				isGenerating={isGenerating}
+				onGenerate={handleGenerate}
 			/>
+			<QuestionsPanel bancaId={bancaId} />
 			<KeyboardShortcutsDialog />
-		</>
+		</div>
 	);
 }
