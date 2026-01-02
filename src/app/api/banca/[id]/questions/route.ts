@@ -12,6 +12,7 @@ import {
 	questionStatusEnum,
 	questions,
 	sources,
+	userAnswers,
 } from "@/server/db/schema";
 
 type InsertQuestion = InferInsertModel<typeof questions>;
@@ -28,6 +29,7 @@ const generateQuestionsSchema = z.object({
 	count: z.number().int().min(1).max(20).default(5),
 	difficulty: z.enum(difficultyEnum.enumValues).optional(),
 	tags: z.array(z.string()).optional(),
+	systemPrompt: z.string().optional(),
 });
 
 // GET /api/banca/[id]/questions - Fetch questions for a banca
@@ -97,7 +99,7 @@ export async function GET(
 			.limit(limit)
 			.offset(offset);
 
-		// Fetch options for each question
+		// Fetch options and user answers for each question
 		const questionsWithOptions = await Promise.all(
 			userQuestions.map(async (question) => {
 				const options = await db
@@ -106,9 +108,22 @@ export async function GET(
 					.where(eq(questionOptions.questionId, question.id))
 					.orderBy(questionOptions.displayOrder);
 
+				// Fetch user answer if exists
+				const userAnswer = await db
+					.select()
+					.from(userAnswers)
+					.where(
+						and(
+							eq(userAnswers.questionId, question.id),
+							eq(userAnswers.userId, session.user.id),
+						),
+					)
+					.limit(1);
+
 				return {
 					...question,
 					options,
+					userAnswer: userAnswer[0] ?? null,
 				};
 			}),
 		);
@@ -204,6 +219,7 @@ Generate exactly ${validatedData.count} questions.`;
 		const message = await anthropic.messages.create({
 			model: "claude-sonnet-4-20250514",
 			max_tokens: 8192,
+			...(validatedData.systemPrompt && { system: validatedData.systemPrompt }),
 			messages: [
 				{
 					role: "user",
