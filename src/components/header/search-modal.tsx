@@ -18,7 +18,7 @@ interface SearchModalProps {
 export function SearchModal({ open, onOpenChange }: SearchModalProps) {
 	return (
 		<Dialog onOpenChange={onOpenChange} open={open}>
-			<DialogContent className="max-w-2xl overflow-hidden p-0">
+			<DialogContent className="max-w-2xl overflow-hidden bg-zinc-100 p-0 dark:bg-zinc-900">
 				<DialogTitle className="hidden">Search</DialogTitle>
 				<Command className="rounded-lg border-0">
 					<CommandInput placeholder="Search..." />

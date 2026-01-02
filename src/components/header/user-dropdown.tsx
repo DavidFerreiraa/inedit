@@ -1,6 +1,6 @@
 "use client";
 
-import { LogOut } from "lucide-react";
+import { FileText, LogOut } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -59,7 +59,10 @@ export function UserDropdown({ session }: UserDropdownProps) {
 					</AvatarFallback>
 				</Avatar>
 			</DropdownMenuTrigger>
-			<DropdownMenuContent align="end" className="w-56">
+			<DropdownMenuContent
+				align="end"
+				className="w-56 bg-zinc-100 dark:bg-zinc-900"
+			>
 				<DropdownMenuLabel>
 					<div className="flex flex-col space-y-1">
 						<p className="font-medium text-sm">{session.user.name ?? "User"}</p>
@@ -68,6 +71,11 @@ export function UserDropdown({ session }: UserDropdownProps) {
 						</p>
 					</div>
 				</DropdownMenuLabel>
+				<DropdownMenuSeparator />
+				<DropdownMenuItem onClick={() => router.push("/profile/my-inedits")}>
+					<FileText className="mr-2 h-4 w-4" />
+					<span>Meus Inedits</span>
+				</DropdownMenuItem>
 				<DropdownMenuSeparator />
 				<DropdownMenuItem disabled={isLoading} onClick={handleSignOut}>
 					<LogOut className="mr-2 h-4 w-4" />
