@@ -6,6 +6,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { GenerateButton } from "./generate-button";
 import { SourceCard } from "./source-card";
+import { SourceSelectorDropdown } from "./source-selector-dropdown";
 import { SourceTextInput } from "./source-text-input";
 import { SourceUploader } from "./source-uploader";
 import { SourceUrlInput } from "./source-url-input";
@@ -35,6 +36,9 @@ export function SourcesPanel({
 	const [sources, setSources] = useState<Source[]>([]);
 	const [isLoading, setIsLoading] = useState(true);
 	const [selectedSourceIds, setSelectedSourceIds] = useState<number[]>([]);
+	const [selectedSource, setSelectedSource] = useState<
+		"upload" | "url" | "text"
+	>("upload");
 
 	// Fetch sources
 	const fetchSources = async () => {
@@ -85,16 +89,49 @@ export function SourcesPanel({
 	return (
 		<div className="flex h-full flex-col bg-background">
 			{/* Header */}
-			<div className="border-b p-4">
-				<h2 className="font-semibold text-lg">Sources</h2>
-				<p className="text-muted-foreground text-sm">
-					Add study materials to generate questions
+			<div className="border-b p-3 md:p-4">
+				<h2 className="font-semibold text-base md:text-lg">Conteúdo</h2>
+				<p className="text-muted-foreground text-xs md:text-sm">
+					Adicione seu conteúdo de estudo para gerar questões automaticamente
 				</p>
 			</div>
 
-			{/* Add Sources Tabs */}
-			<div className="border-b p-4">
-				<Tabs className="w-full" defaultValue="upload">
+			{/* Add Sources - Responsive */}
+			<div className="border-b p-3 md:p-4">
+				{/* Mobile: Dropdown Selector */}
+				<div className="space-y-4 md:hidden">
+					<SourceSelectorDropdown
+						onValueChange={(value) =>
+							setSelectedSource(value as "upload" | "url" | "text")
+						}
+						value={selectedSource}
+					/>
+					{/* Conditionally render selected input based on dropdown */}
+					{selectedSource === "upload" && (
+						<SourceUploader
+							bancaId={bancaId}
+							onUploadSuccess={handleAddSuccess}
+						/>
+					)}
+					{selectedSource === "url" && (
+						<SourceUrlInput bancaId={bancaId} onAddSuccess={handleAddSuccess} />
+					)}
+					{selectedSource === "text" && (
+						<SourceTextInput
+							bancaId={bancaId}
+							onAddSuccess={handleAddSuccess}
+						/>
+					)}
+				</div>
+
+				{/* Desktop: Tabs (existing pattern) */}
+				<Tabs
+					className="hidden w-full md:block"
+					onValueChange={(value) =>
+						setSelectedSource(value as "upload" | "url" | "text")
+					}
+					value={selectedSource}
+				>
 					<TabsList className="grid w-full grid-cols-3">
 						<TabsTrigger value="upload">Upload</TabsTrigger>
 						<TabsTrigger value="url">URL</TabsTrigger>
@@ -123,14 +160,14 @@ export function SourcesPanel({
 
 			{/* Sources List */}
 			<div className="flex-1 overflow-hidden">
-				<ScrollArea className="h-full">
-					<div className="space-y-4 p-4">
+				<ScrollArea className="h-full flex-1 overflow-hidden">
+					<div className="space-y-3 p-3 md:space-y-4 md:p-4">
 						{isLoading ? (
 							<div className="flex items-center justify-center py-8">
 								<Loader2 className="size-6 animate-spin text-muted-foreground" />
 							</div>
 						) : sources.length === 0 ? (
-							<div className="rounded-lg border border-dashed p-8 text-center">
+							<div className="rounded-lg border border-dashed p-6 text-center md:p-8">
 								<p className="text-muted-foreground text-sm">
 									No sources yet. Add your first source above!
 								</p>
@@ -150,16 +187,23 @@ export function SourcesPanel({
 			</div>
 
 			{/* Generate Button */}
-			<div className="border-t p-4">
+			<div className="border-t p-3 md:p-4">
 				<GenerateButton
 					className="w-full"
 					disabled={completedSources.length === 0 || isGenerating}
 					isLoading={isGenerating}
 					onClick={handleGenerate}
 				>
-					{isGenerating
-						? "Generating..."
-						: `Generate Questions (${completedSources.length} sources)`}
+					<span className="hidden sm:inline">
+						{isGenerating
+							? "Generating..."
+							: `Generate Questions (${completedSources.length} sources)`}
+					</span>
+					<span className="sm:hidden">
+						{isGenerating
+							? "Generating..."
+							: `Generate (${completedSources.length})`}
+					</span>
 				</GenerateButton>
 			</div>
 		</div>

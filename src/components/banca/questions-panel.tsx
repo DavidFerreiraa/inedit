@@ -18,6 +18,16 @@ interface QuestionOption {
 	createdAt: Date;
 }
 
+interface UserAnswer {
+	id: number;
+	userId: string;
+	questionId: number;
+	selectedOptionId: number;
+	isCorrect: boolean;
+	timeSpentSeconds: number;
+	answeredAt: Date;
+}
+
 interface Question {
 	id: number;
 	userId: string;
@@ -37,6 +47,7 @@ interface Question {
 	createdAt: Date;
 	updatedAt: Date | null;
 	options: QuestionOption[];
+	userAnswer: UserAnswer | null;
 }
 
 interface QuestionsResponse {
@@ -79,9 +90,10 @@ export function QuestionsPanel({ bancaId }: QuestionsPanelProps) {
 
 	// Track answered questions
 	const answeredQuestions = new Set<number>();
-	questions.forEach((_q) => {
-		// This is a placeholder - in a real app, you'd fetch user answers
-		// from the API and check if this question has been answered
+	questions.forEach((q) => {
+		if (q.userAnswer) {
+			answeredQuestions.add(q.id);
+		}
 	});
 
 	// Submit answer mutation
@@ -173,7 +185,7 @@ export function QuestionsPanel({ bancaId }: QuestionsPanelProps) {
 	// Error state
 	if (error) {
 		return (
-			<div className="flex h-full items-center justify-center p-6">
+			<div className="flex h-full items-center justify-center rounded-lg p-6">
 				<Alert variant="destructive">
 					<AlertCircle className="h-4 w-4" />
 					<AlertDescription>
@@ -204,19 +216,25 @@ export function QuestionsPanel({ bancaId }: QuestionsPanelProps) {
 	}
 
 	return (
-		<div className="flex h-full flex-col gap-6 overflow-y-auto p-6">
+		<div className="flex h-full flex-col gap-4 overflow-y-auto border-foreground/10 border-l p-4 md:gap-6 md:p-6">
 			{/* Header */}
 			<div className="flex items-center justify-between">
-				<h2 className="font-bold text-2xl text-foreground">Questões</h2>
+				<h2 className="font-bold text-foreground text-xl md:text-2xl">
+					Questões
+				</h2>
 			</div>
 
 			{/* Question Card */}
 			{currentQuestion && (
 				<QuestionCard
+					key={currentQuestion.id}
 					onAnswer={handleAnswer}
 					question={currentQuestion}
 					showExplanation={showExplanation}
-					userAnswer={selectedAnswerOptionId}
+					userAnswer={
+						selectedAnswerOptionId ??
+						currentQuestion.userAnswer?.selectedOptionId
+					}
 				/>
 			)}
 
@@ -229,9 +247,9 @@ export function QuestionsPanel({ bancaId }: QuestionsPanelProps) {
 				totalQuestions={questions.length}
 			/>
 
-			{/* Keyboard Hint for Explanation */}
+			{/* Keyboard Hint for Explanation - Hide on mobile (touch users don't need it) */}
 			{selectedAnswerOptionId !== null && currentQuestion?.explanation && (
-				<div className="flex items-center justify-center text-muted-foreground text-xs">
+				<div className="hidden items-center justify-center text-muted-foreground text-xs sm:flex">
 					<kbd className="rounded bg-muted px-2 py-1 font-mono">Espaço</kbd>
 					<span className="ml-2">para mostrar/ocultar explicação</span>
 				</div>
