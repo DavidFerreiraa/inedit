@@ -4,6 +4,7 @@ import { persist } from "zustand/middleware";
 interface BancaStore {
 	// UI State
 	isFullscreen: boolean;
+	isMobileQuestionsDrawerOpen: boolean;
 	panelSizes: {
 		sources: number;
 		questions: number;
@@ -21,6 +22,7 @@ interface BancaStore {
 
 	// Actions
 	toggleFullscreen: () => void;
+	setMobileQuestionsDrawerOpen: (open: boolean) => void;
 	setPanelSizes: (sources: number, questions: number) => void;
 	setCurrentQuestionIndex: (index: number) => void;
 	setSelectedAnswerOptionId: (id: number | null) => void;
@@ -36,6 +38,7 @@ export const useBancaStore = create<BancaStore>()(
 		(set) => ({
 			// Initial State
 			isFullscreen: false,
+			isMobileQuestionsDrawerOpen: false,
 			panelSizes: {
 				sources: 30,
 				questions: 70,
@@ -50,6 +53,9 @@ export const useBancaStore = create<BancaStore>()(
 			// Actions
 			toggleFullscreen: () =>
 				set((state) => ({ isFullscreen: !state.isFullscreen })),
+
+			setMobileQuestionsDrawerOpen: (open) =>
+				set({ isMobileQuestionsDrawerOpen: open }),
 
 			setPanelSizes: (sources, questions) =>
 				set({ panelSizes: { sources, questions } }),

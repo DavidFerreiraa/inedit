@@ -81,55 +81,53 @@ export function SourceCard({ source, bancaId, onDelete }: SourceCardProps) {
 		source.processingStatus === "processing";
 
 	return (
-		<div className="group relative rounded-lg border bg-card p-4 transition-shadow hover:shadow-md">
-			<div className="flex items-start gap-3">
-				{/* Icon */}
-				<div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-					{isPending ? (
-						<Loader2 className="size-5 animate-spin text-primary" />
-					) : (
-						<Icon className="size-5 text-primary" />
-					)}
+		<div className="relative flex items-start gap-3 rounded-lg border bg-card p-4 transition-shadow hover:shadow-md">
+			{/* Icon */}
+			<div className="absolute top-5 left-5 rounded-lg bg-primary/10">
+				{isPending ? (
+					<Loader2 className="size-5 animate-spin text-primary" />
+				) : (
+					<Icon className="size-5 text-primary" />
+				)}
+			</div>
+
+			{/* Content */}
+			<div className="w-full flex-1 space-y-2 pl-8">
+				<div className="flex items-start justify-between gap-2">
+					<h3 className="truncate font-medium text-sm">{source.title}</h3>
+					<Button
+						className="size-8 shrink-0 opacity-0 transition-opacity group-hover:opacity-100"
+						disabled={isDeleting}
+						onClick={handleDelete}
+						size="icon"
+						variant="ghost"
+					>
+						{isDeleting ? (
+							<Loader2 className="size-4 animate-spin" />
+						) : (
+							<Trash2 className="size-4" />
+						)}
+					</Button>
 				</div>
 
-				{/* Content */}
-				<div className="min-w-0 flex-1 space-y-2">
-					<div className="flex items-start justify-between gap-2">
-						<h3 className="truncate font-medium text-sm">{source.title}</h3>
-						<Button
-							className="size-8 shrink-0 opacity-0 transition-opacity group-hover:opacity-100"
-							disabled={isDeleting}
-							onClick={handleDelete}
-							size="icon"
-							variant="ghost"
-						>
-							{isDeleting ? (
-								<Loader2 className="size-4 animate-spin" />
-							) : (
-								<Trash2 className="size-4" />
-							)}
-						</Button>
-					</div>
+				<p className="line-clamp-2 text-muted-foreground text-xs">
+					{previewText}
+				</p>
 
-					<p className="line-clamp-2 text-muted-foreground text-xs">
-						{previewText}
-					</p>
-
-					<div className="flex items-center gap-2">
-						<Badge
-							className={cn(
-								"flex items-center gap-1.5 text-xs capitalize",
-								statusColors[source.processingStatus],
-							)}
-							variant="outline"
-						>
-							{isPending && <Loader2 className="size-3 animate-spin" />}
-							{source.processingStatus}
-						</Badge>
-						<span className="text-muted-foreground text-xs">
-							{new Date(source.createdAt).toLocaleDateString()}
-						</span>
-					</div>
+				<div className="flex items-center gap-2">
+					<Badge
+						className={cn(
+							"flex items-center gap-1.5 text-xs capitalize",
+							statusColors[source.processingStatus],
+						)}
+						variant="outline"
+					>
+						{isPending && <Loader2 className="size-3 animate-spin" />}
+						{source.processingStatus}
+					</Badge>
+					<span className="text-muted-foreground text-xs">
+						{new Date(source.createdAt).toLocaleDateString()}
+					</span>
 				</div>
 			</div>
 		</div>
