@@ -1,6 +1,7 @@
 "use client";
 
 import { Filter, Search, X } from "lucide-react";
+import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -32,6 +33,8 @@ export function FiltersBar({
 	onClearFilters,
 	hasActiveFilters,
 }: FiltersBarProps) {
+	const [tagSearchQuery, setTagSearchQuery] = useState("");
+
 	const toggleTag = (tag: string) => {
 		if (selectedTags.includes(tag)) {
 			onTagsChange(selectedTags.filter((t) => t !== tag));
@@ -43,6 +46,16 @@ export function FiltersBar({
 	const removeTag = (tag: string) => {
 		onTagsChange(selectedTags.filter((t) => t !== tag));
 	};
+
+	// Filter tags based on search query
+	const filteredTags = allTags.filter((tag) =>
+		tag.toLowerCase().includes(tagSearchQuery.toLowerCase()),
+	);
+
+	// Limit to 10 tags for display
+	const displayedTags = filteredTags.slice(0, 10);
+	const totalTags = allTags.length;
+	const hiddenTagsCount = filteredTags.length - displayedTags.length;
 
 	return (
 		<div className="space-y-3">
@@ -75,10 +88,25 @@ export function FiltersBar({
 					</DropdownMenuTrigger>
 					<DropdownMenuContent
 						align="end"
-						className="w-56 bg-zinc-100 dark:bg-zinc-900"
+						className="w-64 bg-zinc-100 dark:bg-zinc-900"
 					>
 						<DropdownMenuLabel>Filtrar por tags</DropdownMenuLabel>
 						<DropdownMenuSeparator />
+
+						{/* Search Input */}
+						<div className="px-2 pb-2">
+							<div className="relative">
+								<Search className="absolute top-1/2 left-2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+								<Input
+									className="h-8 pl-8 text-sm"
+									onChange={(e) => setTagSearchQuery(e.target.value)}
+									placeholder="Buscar tags..."
+									type="text"
+									value={tagSearchQuery}
+								/>
+							</div>
+						</div>
+
 						{selectedTags.length > 0 && (
 							<>
 								<DropdownMenuCheckboxItem
@@ -90,20 +118,46 @@ export function FiltersBar({
 								<DropdownMenuSeparator />
 							</>
 						)}
-						{allTags.length === 0 ? (
-							<div className="px-2 py-3 text-center text-muted-foreground text-sm">
-								Nenhuma tag disponível
-							</div>
-						) : (
-							allTags.map((tag) => (
-								<DropdownMenuCheckboxItem
-									checked={selectedTags.includes(tag)}
-									key={tag}
-									onCheckedChange={() => toggleTag(tag)}
-								>
-									{tag}
-								</DropdownMenuCheckboxItem>
-							))
+
+						{/* Tags List */}
+						<div className="max-h-60 overflow-y-auto">
+							{allTags.length === 0 ? (
+								<div className="px-2 py-3 text-center text-muted-foreground text-sm">
+									Nenhuma tag disponível
+								</div>
+							) : displayedTags.length === 0 ? (
+								<div className="px-2 py-3 text-center text-muted-foreground text-sm">
+									Nenhuma tag encontrada
+								</div>
+							) : (
+								displayedTags.map((tag) => (
+									<DropdownMenuCheckboxItem
+										checked={selectedTags.includes(tag)}
+										key={tag}
+										onCheckedChange={() => toggleTag(tag)}
+									>
+										{tag}
+									</DropdownMenuCheckboxItem>
+								))
+							)}
+						</div>
+
+						{/* Footer with tag count */}
+						{totalTags > 0 && (
+							<>
+								<DropdownMenuSeparator />
+								<div className="px-2 py-2 text-center text-muted-foreground text-xs">
+									{filteredTags.length === totalTags
+										? `${totalTags} ${totalTags === 1 ? "tag" : "tags"} no total`
+										: `Mostrando ${displayedTags.length} de ${filteredTags.length} ${filteredTags.length === 1 ? "tag" : "tags"}`}
+									{hiddenTagsCount > 0 && (
+										<span className="block">
+											(+{hiddenTagsCount}{" "}
+											{hiddenTagsCount === 1 ? "oculta" : "ocultas"})
+										</span>
+									)}
+								</div>
+							</>
 						)}
 					</DropdownMenuContent>
 				</DropdownMenu>

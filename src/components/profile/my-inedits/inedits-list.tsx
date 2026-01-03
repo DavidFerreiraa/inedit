@@ -1,6 +1,5 @@
 "use client";
 
-import { ScrollArea } from "@/components/ui/scroll-area";
 import type { GroupedInedits } from "@/server/actions/my-inedits";
 import { BancaGroup } from "./banca-group";
 import { EmptyState } from "./empty-state";
