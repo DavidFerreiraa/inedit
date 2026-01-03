@@ -19,6 +19,12 @@ interface QuestionOption {
 	displayOrder: number;
 }
 
+interface AnswerStats {
+	totalAttempts: number;
+	correctAttempts: number;
+	incorrectAttempts: number;
+}
+
 interface Question {
 	id: number;
 	title: string;
@@ -27,6 +33,7 @@ interface Question {
 	explanation: string | null;
 	difficulty: "easy" | "medium" | "hard";
 	options: QuestionOption[];
+	answerStats?: AnswerStats;
 }
 
 interface QuestionCardProps {
@@ -80,20 +87,42 @@ export function QuestionCard({
 			transition={{ duration: 0.3 }}
 		>
 			{/* Header */}
-			<div className="flex items-start justify-between gap-4">
-				<div className="flex flex-wrap gap-2">
-					<Badge
-						className={cn("text-xs", difficultyColors[question.difficulty])}
-						variant="secondary"
-					>
-						{question.difficulty}
-					</Badge>
-					{question.tags.map((tag) => (
-						<Badge className="text-xs" key={tag} variant="outline">
-							{tag}
+			<div className="flex flex-col gap-3">
+				<div className="flex items-start justify-between gap-4">
+					<div className="flex flex-wrap gap-2">
+						<Badge
+							className={cn("text-xs", difficultyColors[question.difficulty])}
+							variant="secondary"
+						>
+							{question.difficulty}
 						</Badge>
-					))}
+						{question.tags.map((tag) => (
+							<Badge className="text-xs" key={tag} variant="outline">
+								{tag}
+							</Badge>
+						))}
+					</div>
 				</div>
+
+				{/* Answer Statistics */}
+				{question.answerStats && question.answerStats.totalAttempts > 0 && (
+					<div className="flex items-center gap-3 rounded-lg bg-muted/50 p-3 text-sm">
+						<span className="text-muted-foreground">
+							Histórico de respostas:
+						</span>
+						<div className="flex gap-4">
+							<span className="font-medium text-foreground">
+								Total: {question.answerStats.totalAttempts}
+							</span>
+							<span className="font-medium text-green-600 dark:text-green-400">
+								✓ {question.answerStats.correctAttempts}
+							</span>
+							<span className="font-medium text-red-600 dark:text-red-400">
+								✗ {question.answerStats.incorrectAttempts}
+							</span>
+						</div>
+					</div>
+				)}
 			</div>
 
 			{/* Question Title */}

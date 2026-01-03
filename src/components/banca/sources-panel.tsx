@@ -2,7 +2,6 @@
 
 import { Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { GenerateButton } from "./generate-button";
 import { SourceCard } from "./source-card";
@@ -159,31 +158,29 @@ export function SourcesPanel({
 			</div>
 
 			{/* Sources List */}
-			<div className="flex-1 overflow-hidden">
-				<ScrollArea className="h-full flex-1 overflow-hidden">
-					<div className="space-y-3 p-3 md:space-y-4 md:p-4">
-						{isLoading ? (
-							<div className="flex items-center justify-center py-8">
-								<Loader2 className="size-6 animate-spin text-muted-foreground" />
-							</div>
-						) : sources.length === 0 ? (
-							<div className="rounded-lg border border-dashed p-6 text-center md:p-8">
-								<p className="text-muted-foreground text-sm">
-									No sources yet. Add your first source above!
-								</p>
-							</div>
-						) : (
-							sources.map((source) => (
-								<SourceCard
-									bancaId={bancaId}
-									key={source.id}
-									onDelete={handleDelete}
-									source={source}
-								/>
-							))
-						)}
-					</div>
-				</ScrollArea>
+			<div className="max-h-82 flex-1 overflow-y-auto md:max-h-full">
+				<div className="space-y-3 p-3 md:space-y-4 md:p-4">
+					{isLoading ? (
+						<div className="flex items-center justify-center py-8">
+							<Loader2 className="size-6 animate-spin text-muted-foreground" />
+						</div>
+					) : sources.length === 0 ? (
+						<div className="rounded-lg border border-dashed p-6 text-center md:p-8">
+							<p className="text-muted-foreground text-sm">
+								No sources yet. Add your first source above!
+							</p>
+						</div>
+					) : (
+						sources.map((source) => (
+							<SourceCard
+								bancaId={bancaId}
+								key={source.id}
+								onDelete={handleDelete}
+								source={source}
+							/>
+						))
+					)}
+				</div>
 			</div>
 
 			{/* Generate Button */}

@@ -6,10 +6,13 @@ import { BancaPageClient } from "./page-client";
 
 export default async function BancaPage({
 	params,
+	searchParams,
 }: {
 	params: Promise<{ id: string }>;
+	searchParams: Promise<{ questionId?: string; isEmptyAnswer?: string }>;
 }) {
 	const { id } = await params;
+	const { questionId, isEmptyAnswer } = await searchParams;
 
 	// Fetch banca from database
 	const allBancas = await getBancas();
@@ -33,7 +36,11 @@ export default async function BancaPage({
 		<>
 			<AppHeader />
 			<main className="min-h-screen bg-background pt-14">
-				<BancaPageClient bancaId={id} />
+				<BancaPageClient
+					bancaId={id}
+					isEmptyAnswer={isEmptyAnswer === "true"}
+					questionId={questionId ? Number.parseInt(questionId, 10) : undefined}
+				/>
 			</main>
 		</>
 	);

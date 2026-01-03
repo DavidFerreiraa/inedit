@@ -20,6 +20,10 @@ interface BancaStore {
 	statusFilter: "draft" | "published" | "archived" | null;
 	searchQuery: string;
 
+	// Preview Mode State
+	previewMode: boolean;
+	previewQuestionIds: number[];
+
 	// Actions
 	toggleFullscreen: () => void;
 	setMobileQuestionsDrawerOpen: (open: boolean) => void;
@@ -31,6 +35,9 @@ interface BancaStore {
 	setStatusFilter: (status: "draft" | "published" | "archived" | null) => void;
 	setSearchQuery: (query: string) => void;
 	resetFilters: () => void;
+	setPreviewMode: (enabled: boolean) => void;
+	setPreviewQuestionIds: (ids: number[]) => void;
+	clearPreview: () => void;
 }
 
 export const useBancaStore = create<BancaStore>()(
@@ -49,6 +56,8 @@ export const useBancaStore = create<BancaStore>()(
 			difficultyFilter: null,
 			statusFilter: null,
 			searchQuery: "",
+			previewMode: false,
+			previewQuestionIds: [],
 
 			// Actions
 			toggleFullscreen: () =>
@@ -84,6 +93,19 @@ export const useBancaStore = create<BancaStore>()(
 					difficultyFilter: null,
 					statusFilter: null,
 					searchQuery: "",
+				}),
+
+			setPreviewMode: (enabled) => set({ previewMode: enabled }),
+
+			setPreviewQuestionIds: (ids) => set({ previewQuestionIds: ids }),
+
+			clearPreview: () =>
+				set({
+					previewMode: false,
+					previewQuestionIds: [],
+					currentQuestionIndex: 0,
+					selectedAnswerOptionId: null,
+					showExplanation: false,
 				}),
 		}),
 		{

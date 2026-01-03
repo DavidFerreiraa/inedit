@@ -1,19 +1,65 @@
 "use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { KeyboardShortcutsDialog } from "@/components/banca/keyboard-shortcuts-dialog";
 import { QuestionsPanel } from "@/components/banca/questions-panel";
-import { ResizableLayout } from "@/components/banca/resizable-layout";
 import { SourcesPanel } from "@/components/banca/sources-panel";
+import { useBancaStore } from "@/lib/stores/banca-store";
 
 interface BancaPageClientProps {
 	bancaId: string;
+	questionId?: number;
+	isEmptyAnswer?: boolean;
 }
 
-export function BancaPageClient({ bancaId }: BancaPageClientProps) {
+export function BancaPageClient({
+	bancaId,
+	questionId,
+	isEmptyAnswer,
+}: BancaPageClientProps) {
 	const queryClient = useQueryClient();
 	const [isGenerating, setIsGenerating] = useState(false);
+	const {
+		previewQuestionIds,
+		setPreviewMode,
+		setPreviewQuestionIds,
+		clearPreview,
+	} = useBancaStore();
+
+	// Check for existing drafts on mount
+	useEffect(() => {
+		async function checkDrafts() {
+			const response = await fetch(
+				`/api/banca/${bancaId}/questions?status=draft`,
+			);
+			if (response.ok) {
+				const { questions } = await response.json();
+				if (questions.length > 0) {
+					setPreviewMode(true);
+					setPreviewQuestionIds(questions.map((q: { id: number }) => q.id));
+				}
+			}
+		}
+		checkDrafts();
+	}, [bancaId, setPreviewMode, setPreviewQuestionIds]);
+
+	// Publish drafts mutation
+	const publishDraftsMutation = useMutation({
+		mutationFn: async ({ questionIds }: { questionIds: number[] }) => {
+			const response = await fetch(`/api/banca/${bancaId}/questions/drafts`, {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ questionIds }),
+			});
+			if (!response.ok) throw new Error("Failed to publish drafts");
+			return response.json();
+		},
+		onSuccess: () => {
+			clearPreview();
+			queryClient.invalidateQueries({ queryKey: ["questions", bancaId] });
+		},
+	});
 
 	const generateQuestionsMutation = useMutation({
 		mutationFn: async ({
@@ -41,7 +87,11 @@ export function BancaPageClient({ bancaId }: BancaPageClientProps) {
 		onMutate: () => {
 			setIsGenerating(true);
 		},
-		onSuccess: () => {
+		onSuccess: (data) => {
+			// Set preview mode with newly generated question IDs
+			const questionIds = data.questions.map((q: { id: number }) => q.id);
+			setPreviewMode(true);
+			setPreviewQuestionIds(questionIds);
 			// Invalidate questions query to refetch
 			queryClient.invalidateQueries({ queryKey: ["questions", bancaId] });
 		},
@@ -58,24 +108,40 @@ export function BancaPageClient({ bancaId }: BancaPageClientProps) {
 		},
 	});
 
-	const handleGenerate = (sourceIds: number[]) => {
+	const handleGenerate = async (sourceIds: number[]) => {
+		// Auto-save existing previews before generating new ones
+		if (previewQuestionIds.length > 0) {
+			try {
+				await publishDraftsMutation.mutateAsync({
+					questionIds: previewQuestionIds,
+				});
+			} catch (error) {
+				console.error("Failed to auto-save previous preview:", error);
+				// Continue with generation even if auto-save fails
+			}
+		}
+
 		// Hardcoded system prompt - edit this value to customize question generation
 		const systemPrompt = `You are an expert question generator for the CEBRASPE exam format.
 			Focus on creating high-quality questions that test deep understanding of the material.
-			Ensure questions are clear, unambiguous, and have definitive correct answers. 
+			Ensure questions are clear, unambiguous, and have definitive correct answers.
 			Keep the focus on the way that CEBRASPE formats their questions. Your return should be in brazilian portuguese.`;
 
 		generateQuestionsMutation.mutate({ sourceIds, count: 5, systemPrompt });
 	};
 
 	return (
-		<div className="flex">
+		<div className="flex flex-col">
 			<SourcesPanel
 				bancaId={bancaId}
 				isGenerating={isGenerating}
 				onGenerate={handleGenerate}
 			/>
-			<QuestionsPanel bancaId={bancaId} />
+			<QuestionsPanel
+				bancaId={bancaId}
+				isEmptyAnswer={isEmptyAnswer}
+				questionId={questionId}
+			/>
 			<KeyboardShortcutsDialog />
 		</div>
 	);
