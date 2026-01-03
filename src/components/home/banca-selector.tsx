@@ -79,7 +79,7 @@ export function BancaSelector({ bancas: bancasFromDB }: BancaSelectorProps) {
 					}
 
 					return (
-						<Link href={banca.route} key={banca.id}>
+						<Link href={`${banca.route}?limit=5`} key={banca.id}>
 							<div className="group relative flex flex-col items-center justify-center rounded-xl border border-border bg-card p-8 transition-all duration-200 hover:shadow-border/20 hover:shadow-lg md:p-12">
 								<div className="relative h-24 w-full md:h-32">
 									<Image

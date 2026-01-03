@@ -11,12 +11,14 @@ interface BancaPageClientProps {
 	bancaId: string;
 	questionId?: number;
 	isEmptyAnswer?: boolean;
+	limit?: number;
 }
 
 export function BancaPageClient({
 	bancaId,
 	questionId,
 	isEmptyAnswer,
+	limit,
 }: BancaPageClientProps) {
 	const queryClient = useQueryClient();
 	const [isGenerating, setIsGenerating] = useState(false);
@@ -131,7 +133,7 @@ export function BancaPageClient({
 	};
 
 	return (
-		<div className="flex flex-col">
+		<div className="flex flex-col lg:flex-row">
 			<SourcesPanel
 				bancaId={bancaId}
 				isGenerating={isGenerating}
@@ -140,6 +142,7 @@ export function BancaPageClient({
 			<QuestionsPanel
 				bancaId={bancaId}
 				isEmptyAnswer={isEmptyAnswer}
+				limit={limit}
 				questionId={questionId}
 			/>
 			<KeyboardShortcutsDialog />
