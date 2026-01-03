@@ -64,11 +64,7 @@ export function IneditsList({
 					onClearFilters={onClearFilters}
 				/>
 			) : (
-				<>
-					{groups.map((group) => (
-						<BancaGroup group={group} key={group.bancaId} />
-					))}
-				</>
+				groups.map((group) => <BancaGroup group={group} key={group.bancaId} />)
 			)}
 		</div>
 	);

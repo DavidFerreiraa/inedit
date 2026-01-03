@@ -23,7 +23,7 @@ export function IneditActionsMenu({ question }: IneditActionsMenuProps) {
 	const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
 	const handleView = () => {
-		router.push(`/banca/${question.banca.id}`);
+		router.push(`/banca/${question.banca.id}?questionId=${question.id}`);
 	};
 
 	const handleAnswerAgain = () => {
