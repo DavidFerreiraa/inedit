@@ -2,10 +2,17 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AlertCircle, BookOpen } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useBancaStore } from "@/lib/stores/banca-store";
+import { PreviewActions } from "./preview-actions";
+import { PreviewBanner } from "./preview-banner";
 import { QuestionCard } from "./question-card";
 import { QuestionNavigation } from "./question-navigation";
 
@@ -28,6 +35,12 @@ interface UserAnswer {
 	answeredAt: Date;
 }
 
+interface AnswerStats {
+	totalAttempts: number;
+	correctAttempts: number;
+	incorrectAttempts: number;
+}
+
 interface Question {
 	id: number;
 	userId: string;
@@ -48,6 +61,7 @@ interface Question {
 	updatedAt: Date | null;
 	options: QuestionOption[];
 	userAnswer: UserAnswer | null;
+	answerStats: AnswerStats;
 }
 
 interface QuestionsResponse {
@@ -56,9 +70,16 @@ interface QuestionsResponse {
 
 interface QuestionsPanelProps {
 	bancaId: string;
+	questionId?: number;
+	isEmptyAnswer?: boolean;
 }
 
-export function QuestionsPanel({ bancaId }: QuestionsPanelProps) {
+export function QuestionsPanel({
+	bancaId,
+	questionId,
+	isEmptyAnswer,
+}: QuestionsPanelProps) {
+	const router = useRouter();
 	const queryClient = useQueryClient();
 	const {
 		currentQuestionIndex,
@@ -67,25 +88,60 @@ export function QuestionsPanel({ bancaId }: QuestionsPanelProps) {
 		setSelectedAnswerOptionId,
 		showExplanation,
 		toggleExplanation,
+		previewMode,
+		previewQuestionIds,
+		clearPreview,
 	} = useBancaStore();
 
-	// Fetch questions
+	// Difficulty badge colors
+	const difficultyColors = {
+		easy: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
+		medium:
+			"bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400",
+		hard: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400",
+	};
+
+	// Query for published questions (normal mode)
 	const {
-		data: questionsData,
-		isLoading,
-		error,
+		data: publishedData,
+		isLoading: publishedLoading,
+		error: publishedError,
 	} = useQuery<QuestionsResponse>({
-		queryKey: ["questions", bancaId],
+		queryKey: ["questions", bancaId, "published"],
 		queryFn: async () => {
-			const response = await fetch(`/api/banca/${bancaId}/questions`);
-			if (!response.ok) {
-				throw new Error("Failed to fetch questions");
-			}
+			const response = await fetch(
+				`/api/banca/${bancaId}/questions?status=published`,
+			);
+			if (!response.ok) throw new Error("Failed to fetch questions");
 			return response.json();
 		},
+		enabled: !previewMode,
 	});
 
-	const questions = questionsData?.questions ?? [];
+	// Query for draft questions (preview mode)
+	const {
+		data: draftData,
+		isLoading: draftLoading,
+		error: draftError,
+	} = useQuery<QuestionsResponse>({
+		queryKey: ["questions", bancaId, "draft"],
+		queryFn: async () => {
+			const response = await fetch(
+				`/api/banca/${bancaId}/questions?status=draft`,
+			);
+			if (!response.ok) throw new Error("Failed to fetch questions");
+			return response.json();
+		},
+		enabled: previewMode,
+	});
+
+	// Select active data based on mode
+	const questions = previewMode
+		? (draftData?.questions ?? [])
+		: (publishedData?.questions ?? []);
+	const isLoading = previewMode ? draftLoading : publishedLoading;
+	const error = previewMode ? draftError : publishedError;
+
 	const currentQuestion = questions[currentQuestionIndex];
 
 	// Track answered questions
@@ -123,8 +179,47 @@ export function QuestionsPanel({ bancaId }: QuestionsPanelProps) {
 		onSuccess: () => {
 			// Refresh questions to update statistics
 			queryClient.invalidateQueries({ queryKey: ["questions", bancaId] });
+			// Clear query params from URL after answering
+			router.replace(`/banca/${bancaId}`, { scroll: false });
 		},
 	});
+
+	// Publish mutation
+	const publishMutation = useMutation({
+		mutationFn: async () => {
+			const response = await fetch(`/api/banca/${bancaId}/questions/drafts`, {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ questionIds: previewQuestionIds }),
+			});
+			if (!response.ok) throw new Error("Failed to publish questions");
+			return response.json();
+		},
+		onSuccess: () => {
+			clearPreview();
+			queryClient.invalidateQueries({ queryKey: ["questions", bancaId] });
+		},
+	});
+
+	// Discard mutation
+	const discardMutation = useMutation({
+		mutationFn: async () => {
+			const response = await fetch(`/api/banca/${bancaId}/questions/drafts`, {
+				method: "DELETE",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ questionIds: previewQuestionIds }),
+			});
+			if (!response.ok) throw new Error("Failed to discard questions");
+			return response.json();
+		},
+		onSuccess: () => {
+			clearPreview();
+			queryClient.invalidateQueries({ queryKey: ["questions", bancaId] });
+		},
+	});
+
+	const handleSavePreview = () => publishMutation.mutate();
+	const handleDiscardPreview = () => discardMutation.mutate();
 
 	// Handle answer submission
 	const handleAnswer = (optionId: number) => {
@@ -156,6 +251,26 @@ export function QuestionsPanel({ bancaId }: QuestionsPanelProps) {
 			setCurrentQuestionIndex(0);
 		}
 	}, [questions.length, currentQuestionIndex, setCurrentQuestionIndex]);
+
+	// Handle "Answer Again" functionality - reset UI state when isEmptyAnswer is true
+	useEffect(() => {
+		if (isEmptyAnswer && questionId !== undefined) {
+			// Find the index of the question to answer again
+			const questionIndex = questions.findIndex((q) => q.id === questionId);
+			if (questionIndex !== -1) {
+				// Navigate to the question
+				setCurrentQuestionIndex(questionIndex);
+				// Clear the selected answer to allow re-answering
+				setSelectedAnswerOptionId(null);
+			}
+		}
+	}, [
+		isEmptyAnswer,
+		questionId,
+		questions,
+		setCurrentQuestionIndex,
+		setSelectedAnswerOptionId,
+	]);
 
 	// Keyboard shortcut for showing explanation
 	useEffect(() => {
@@ -222,37 +337,80 @@ export function QuestionsPanel({ bancaId }: QuestionsPanelProps) {
 				<h2 className="font-bold text-foreground text-xl md:text-2xl">
 					Questões
 				</h2>
+				{!previewMode && questions.length > 0 && (
+					<Link href={`/banca/${bancaId}/all-questions`}>
+						<Button size="sm" variant="ghost">
+							Ver todas ({questions.length})
+						</Button>
+					</Link>
+				)}
 			</div>
 
-			{/* Question Card */}
-			{currentQuestion && (
-				<QuestionCard
-					key={currentQuestion.id}
-					onAnswer={handleAnswer}
-					question={currentQuestion}
-					showExplanation={showExplanation}
-					userAnswer={
-						selectedAnswerOptionId ??
-						currentQuestion.userAnswer?.selectedOptionId
-					}
-				/>
-			)}
+			{previewMode ? (
+				// PREVIEW MODE
+				<>
+					<PreviewBanner />
+					<div className="space-y-4">
+						{questions.map((q) => (
+							<Card className="p-4" key={q.id}>
+								<div className="space-y-2">
+									<div className="flex gap-2">
+										<Badge className={difficultyColors[q.difficulty]}>
+											{q.difficulty}
+										</Badge>
+										{q.tags.map((tag) => (
+											<Badge key={tag} variant="outline">
+												{tag}
+											</Badge>
+										))}
+									</div>
+									<h3 className="font-semibold">{q.title}</h3>
+									{q.description && (
+										<p className="text-muted-foreground text-sm">
+											{q.description}
+										</p>
+									)}
+								</div>
+							</Card>
+						))}
+					</div>
+					<PreviewActions
+						isLoading={publishMutation.isPending || discardMutation.isPending}
+						onDiscard={handleDiscardPreview}
+						onSave={handleSavePreview}
+					/>
+				</>
+			) : (
+				// NORMAL MODE
+				<>
+					{currentQuestion && (
+						<QuestionCard
+							key={currentQuestion.id}
+							onAnswer={handleAnswer}
+							question={{
+								...currentQuestion,
+								answerStats: currentQuestion.answerStats,
+							}}
+							showExplanation={showExplanation}
+							userAnswer={selectedAnswerOptionId}
+						/>
+					)}
 
-			{/* Navigation */}
-			<QuestionNavigation
-				answeredCount={answeredQuestions.size}
-				currentIndex={currentQuestionIndex}
-				onNext={handleNext}
-				onPrevious={handlePrevious}
-				totalQuestions={questions.length}
-			/>
+					<QuestionNavigation
+						answeredCount={answeredQuestions.size}
+						currentIndex={currentQuestionIndex}
+						onNext={handleNext}
+						onPrevious={handlePrevious}
+						totalQuestions={questions.length}
+					/>
 
-			{/* Keyboard Hint for Explanation - Hide on mobile (touch users don't need it) */}
-			{selectedAnswerOptionId !== null && currentQuestion?.explanation && (
-				<div className="hidden items-center justify-center text-muted-foreground text-xs sm:flex">
-					<kbd className="rounded bg-muted px-2 py-1 font-mono">Espaço</kbd>
-					<span className="ml-2">para mostrar/ocultar explicação</span>
-				</div>
+					{selectedAnswerOptionId !== null && currentQuestion?.explanation && (
+						<div className="hidden items-center justify-center text-muted-foreground text-xs sm:flex">
+							<kbd className="rounded bg-muted px-2 py-1 font-mono">Espaço</kbd>
+							<span className="ml-2">para mostrar/ocultar explicação</span>
+						</div>
+					)}
+				</>
 			)}
 		</div>
 	);
