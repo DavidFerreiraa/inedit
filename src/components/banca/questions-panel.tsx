@@ -72,12 +72,14 @@ interface QuestionsPanelProps {
 	bancaId: string;
 	questionId?: number;
 	isEmptyAnswer?: boolean;
+	limit?: number;
 }
 
 export function QuestionsPanel({
 	bancaId,
 	questionId,
 	isEmptyAnswer,
+	limit,
 }: QuestionsPanelProps) {
 	const router = useRouter();
 	const queryClient = useQueryClient();
@@ -107,10 +109,10 @@ export function QuestionsPanel({
 		isLoading: publishedLoading,
 		error: publishedError,
 	} = useQuery<QuestionsResponse>({
-		queryKey: ["questions", bancaId, "published"],
+		queryKey: ["questions", bancaId, "published", limit],
 		queryFn: async () => {
 			const response = await fetch(
-				`/api/banca/${bancaId}/questions?status=published`,
+				`/api/banca/${bancaId}/questions?status=published&limit=${limit}`,
 			);
 			if (!response.ok) throw new Error("Failed to fetch questions");
 			return response.json();

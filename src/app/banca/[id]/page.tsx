@@ -9,10 +9,14 @@ export default async function BancaPage({
 	searchParams,
 }: {
 	params: Promise<{ id: string }>;
-	searchParams: Promise<{ questionId?: string; isEmptyAnswer?: string }>;
+	searchParams: Promise<{
+		questionId?: string;
+		isEmptyAnswer?: string;
+		limit?: number;
+	}>;
 }) {
 	const { id } = await params;
-	const { questionId, isEmptyAnswer } = await searchParams;
+	const { questionId, isEmptyAnswer, limit } = await searchParams;
 
 	// Fetch banca from database
 	const allBancas = await getBancas();
@@ -39,6 +43,7 @@ export default async function BancaPage({
 				<BancaPageClient
 					bancaId={id}
 					isEmptyAnswer={isEmptyAnswer === "true"}
+					limit={limit}
 					questionId={questionId ? Number.parseInt(questionId, 10) : undefined}
 				/>
 			</main>
