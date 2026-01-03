@@ -182,45 +182,6 @@ const {
 - `src/components/providers.tsx` (React Query Provider)
 - `src/app/layout.tsx` (Updated with Providers)
 
-**Requirements**:
-- Use ResizableLayout component
-- Pass SourcesPanel to left side
-- Pass QuestionsPanel to right side
-- Handle question generation:
-  ```tsx
-  const handleGenerate = async (sourceIds: number[]) => {
-    const response = await fetch(`/api/banca/${bancaId}/questions`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ sourceIds, count: 5 })
-    });
-    // Refresh questions after generation
-  };
-  ```
-- Add React Query provider if not already in layout
-- Authentication check using Better Auth
-- Loading states
-- Error boundaries
-
-**Example Structure**:
-```tsx
-export default async function BancaPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-
-  // Check authentication
-  const session = await auth.api.getSession();
-  if (!session) redirect('/auth/signin');
-
-  return (
-    <ResizableLayout
-      bancaId={id}
-      sourcesPanel={<SourcesPanel bancaId={id} onGenerate={handleGenerate} />}
-      questionsPanel={<QuestionsPanel bancaId={id} />}
-    />
-  );
-}
-```
-
 ### PRIORITY 3: Keyboard Shortcuts Implementation ✅
 
 #### 3.1 Create Keyboard Shortcuts Hook ✅
