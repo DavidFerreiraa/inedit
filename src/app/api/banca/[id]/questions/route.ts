@@ -12,6 +12,7 @@ import {
 	questionStatusEnum,
 	questions,
 	sources,
+	user,
 	userAnswers,
 } from "@/server/db/schema";
 
@@ -169,6 +170,53 @@ export async function POST(
 		}
 
 		const { id: bancaId } = await params;
+
+		// Check generation limit (2 per day)
+		const DAILY_GENERATION_LIMIT = 2;
+		const [userData] = await db
+			.select({
+				dailyGenerationCount: user.dailyGenerationCount,
+				lastGenerationDate: user.lastGenerationDate,
+			})
+			.from(user)
+			.where(eq(user.id, session.user.id));
+
+		if (!userData) {
+			return NextResponse.json({ error: "User not found" }, { status: 404 });
+		}
+
+		// Check if we need to reset the count (new day)
+		const now = new Date();
+		const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+		const lastGenDate = userData.lastGenerationDate
+			? new Date(userData.lastGenerationDate)
+			: null;
+		const lastGenDay = lastGenDate
+			? new Date(
+					lastGenDate.getFullYear(),
+					lastGenDate.getMonth(),
+					lastGenDate.getDate(),
+				)
+			: null;
+
+		const isNewDay = !lastGenDay || lastGenDay.getTime() < today.getTime();
+		const currentCount = isNewDay ? 0 : userData.dailyGenerationCount;
+
+		if (currentCount >= DAILY_GENERATION_LIMIT) {
+			// Calculate reset time (midnight tonight)
+			const tomorrow = new Date(today);
+			tomorrow.setDate(tomorrow.getDate() + 1);
+
+			return NextResponse.json(
+				{
+					error: "Daily generation limit reached",
+					remainingGenerations: 0,
+					resetsAt: tomorrow.toISOString(),
+				},
+				{ status: 429 },
+			);
+		}
+
 		const body = await request.json();
 		const validatedData = generateQuestionsSchema.parse(body);
 
@@ -323,6 +371,16 @@ Generate exactly ${validatedData.count} questions.`;
 				};
 			}),
 		);
+
+		// Update user's generation count
+		const newCount = isNewDay ? 1 : currentCount + 1;
+		await db
+			.update(user)
+			.set({
+				dailyGenerationCount: newCount,
+				lastGenerationDate: now,
+			})
+			.where(eq(user.id, session.user.id));
 
 		return NextResponse.json(
 			{

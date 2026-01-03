@@ -1,7 +1,7 @@
 "use client";
 
 import { Loader2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { GenerateButton } from "./generate-button";
 import { SourceCard } from "./source-card";
@@ -21,6 +21,13 @@ interface Source {
 	createdAt: Date;
 }
 
+interface GenerationStatus {
+	remainingGenerations: number;
+	dailyLimit: number;
+	usedToday: number;
+	resetsAt: string;
+}
+
 interface SourcesPanelProps {
 	bancaId: string;
 	onGenerate?: (sourceIds: number[]) => void;
@@ -38,6 +45,21 @@ export function SourcesPanel({
 	const [selectedSource, setSelectedSource] = useState<
 		"upload" | "url" | "text"
 	>("upload");
+	const [generationStatus, setGenerationStatus] =
+		useState<GenerationStatus | null>(null);
+
+	// Fetch generation status
+	const fetchGenerationStatus = useCallback(async () => {
+		try {
+			const response = await fetch("/api/user/generation-status");
+			if (response.ok) {
+				const data = await response.json();
+				setGenerationStatus(data);
+			}
+		} catch (error) {
+			console.error("Error fetching generation status:", error);
+		}
+	}, []);
 
 	// Fetch sources
 	const fetchSources = async () => {
@@ -63,7 +85,18 @@ export function SourcesPanel({
 	// biome-ignore lint/correctness/useExhaustiveDependencies: fetchSources is stable
 	useEffect(() => {
 		fetchSources();
-	}, [bancaId]);
+		fetchGenerationStatus();
+	}, [bancaId, fetchGenerationStatus]);
+
+	// Refetch generation status when generation completes
+	const [wasGenerating, setWasGenerating] = useState(false);
+	useEffect(() => {
+		if (wasGenerating && !isGenerating) {
+			// Generation just completed, refetch status
+			fetchGenerationStatus();
+		}
+		setWasGenerating(isGenerating);
+	}, [isGenerating, wasGenerating, fetchGenerationStatus]);
 
 	const handleAddSuccess = () => {
 		fetchSources();
@@ -190,6 +223,8 @@ export function SourcesPanel({
 					disabled={completedSources.length === 0 || isGenerating}
 					isLoading={isGenerating}
 					onClick={handleGenerate}
+					remainingGenerations={generationStatus?.remainingGenerations}
+					resetsAt={generationStatus?.resetsAt}
 				>
 					<span className="hidden sm:inline">
 						{isGenerating

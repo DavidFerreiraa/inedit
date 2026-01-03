@@ -2,6 +2,7 @@ import { relations } from "drizzle-orm";
 import {
 	boolean,
 	index,
+	integer,
 	jsonb,
 	pgEnum,
 	pgTableCreator,
@@ -46,6 +47,9 @@ export const user = createTable("user", {
 	updatedAt: timestamp("updated_at")
 		.$defaultFn(() => /* @__PURE__ */ new Date())
 		.notNull(),
+	// Generation limit tracking (2 per day)
+	dailyGenerationCount: integer("daily_generation_count").default(0).notNull(),
+	lastGenerationDate: timestamp("last_generation_date", { withTimezone: true }),
 });
 
 export const session = createTable("session", {
