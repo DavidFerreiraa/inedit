@@ -128,3 +128,53 @@ export async function POST(
 		);
 	}
 }
+
+// GET /api/banca/[id]/questions/[questionId]/answer - Get user's answer history statistics
+export async function GET(
+	request: NextRequest,
+	{ params }: { params: Promise<{ id: string; questionId: string }> },
+) {
+	try {
+		const session = await auth.api.getSession({
+			headers: request.headers,
+		});
+
+		if (!session?.user) {
+			return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+		}
+
+		const { questionId } = await params;
+		const questionIdNum = Number.parseInt(questionId, 10);
+
+		// Get all answer attempts for this user and question
+		const answers = await db
+			.select()
+			.from(userAnswers)
+			.where(
+				and(
+					eq(userAnswers.questionId, questionIdNum),
+					eq(userAnswers.userId, session.user.id),
+				),
+			)
+			.orderBy(userAnswers.answeredAt);
+
+		const totalAttempts = answers.length;
+		const correctAttempts = answers.filter((a) => a.isCorrect).length;
+		const incorrectAttempts = totalAttempts - correctAttempts;
+		const latestAnswer = answers[answers.length - 1] ?? null;
+
+		return NextResponse.json({
+			totalAttempts,
+			correctAttempts,
+			incorrectAttempts,
+			latestAnswer,
+			allAnswers: answers,
+		});
+	} catch (error) {
+		console.error("Error fetching answer statistics:", error);
+		return NextResponse.json(
+			{ error: "Failed to fetch answer statistics" },
+			{ status: 500 },
+		);
+	}
+}

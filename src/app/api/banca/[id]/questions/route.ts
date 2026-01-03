@@ -76,8 +76,10 @@ export async function GET(
 			);
 		}
 
-		if (
-			status &&
+		// Default to published if no status param provided
+		if (!status) {
+			conditions.push(eq(questions.status, "published"));
+		} else if (
 			questionStatusEnum.enumValues.includes(
 				status as (typeof questionStatusEnum.enumValues)[number],
 			)
@@ -108,8 +110,8 @@ export async function GET(
 					.where(eq(questionOptions.questionId, question.id))
 					.orderBy(questionOptions.displayOrder);
 
-				// Fetch user answer if exists
-				const userAnswer = await db
+				// Fetch ALL user answers for this question to calculate statistics
+				const userAnswersList = await db
 					.select()
 					.from(userAnswers)
 					.where(
@@ -118,12 +120,26 @@ export async function GET(
 							eq(userAnswers.userId, session.user.id),
 						),
 					)
-					.limit(1);
+					.orderBy(userAnswers.answeredAt);
+
+				// Calculate answer statistics
+				const totalAttempts = userAnswersList.length;
+				const correctAttempts = userAnswersList.filter(
+					(a) => a.isCorrect,
+				).length;
+				const incorrectAttempts = totalAttempts - correctAttempts;
+				const latestAnswer =
+					userAnswersList[userAnswersList.length - 1] ?? null;
 
 				return {
 					...question,
 					options,
-					userAnswer: userAnswer[0] ?? null,
+					userAnswer: latestAnswer, // Latest answer for backward compatibility
+					answerStats: {
+						totalAttempts,
+						correctAttempts,
+						incorrectAttempts,
+					},
 				};
 			}),
 		);
@@ -256,7 +272,7 @@ Generate exactly ${validatedData.count} questions.`;
 					title: q.title,
 					description: q.description,
 					difficulty: q.difficulty,
-					status: "published",
+					status: "draft",
 					tags: q.tags,
 					generatedFromSourceIds: validatedData.sourceIds,
 					aiPrompt: prompt,
