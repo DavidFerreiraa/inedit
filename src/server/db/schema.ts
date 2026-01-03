@@ -4,7 +4,6 @@ import {
 	index,
 	jsonb,
 	pgEnum,
-	pgTable,
 	pgTableCreator,
 	text,
 	timestamp,
