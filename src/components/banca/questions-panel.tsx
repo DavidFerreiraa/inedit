@@ -254,16 +254,16 @@ export function QuestionsPanel({
 		}
 	}, [questions.length, currentQuestionIndex, setCurrentQuestionIndex]);
 
-	// Handle "Answer Again" functionality - reset UI state when isEmptyAnswer is true
+	// Navigate to specific question when questionId is provided
 	useEffect(() => {
-		if (isEmptyAnswer && questionId !== undefined) {
-			// Find the index of the question to answer again
+		if (questionId !== undefined) {
 			const questionIndex = questions.findIndex((q) => q.id === questionId);
 			if (questionIndex !== -1) {
-				// Navigate to the question
 				setCurrentQuestionIndex(questionIndex);
-				// Clear the selected answer to allow re-answering
-				setSelectedAnswerOptionId(null);
+				// Only clear selected answer if user wants to answer again
+				if (isEmptyAnswer) {
+					setSelectedAnswerOptionId(null);
+				}
 			}
 		}
 	}, [
