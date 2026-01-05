@@ -4,6 +4,11 @@ import { and, desc, eq, inArray } from "drizzle-orm";
 import { type NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { env } from "@/env";
+import {
+	getGenerationLimit,
+	isProOrAbove,
+	type UserRole,
+} from "@/lib/constants/generation-limits";
 import { auth } from "@/server/better-auth/config";
 import { db } from "@/server/db";
 import {
@@ -171,12 +176,12 @@ export async function POST(
 
 		const { id: bancaId } = await params;
 
-		// Check generation limit (2 per day)
-		const DAILY_GENERATION_LIMIT = 2;
+		// Check generation limit based on user role
 		const [userData] = await db
 			.select({
 				dailyGenerationCount: user.dailyGenerationCount,
 				lastGenerationDate: user.lastGenerationDate,
+				role: user.role,
 			})
 			.from(user)
 			.where(eq(user.id, session.user.id));
@@ -202,7 +207,11 @@ export async function POST(
 		const isNewDay = !lastGenDay || lastGenDay.getTime() < today.getTime();
 		const currentCount = isNewDay ? 0 : userData.dailyGenerationCount;
 
-		if (currentCount >= DAILY_GENERATION_LIMIT) {
+		// Get dynamic limit based on user role
+		const userRole = (userData.role ?? "free") as UserRole;
+		const dailyGenerationLimit = getGenerationLimit(userRole);
+
+		if (currentCount >= dailyGenerationLimit) {
 			// Calculate reset time (midnight tonight)
 			const tomorrow = new Date(today);
 			tomorrow.setDate(tomorrow.getDate() + 1);
@@ -219,6 +228,11 @@ export async function POST(
 
 		const body = await request.json();
 		const validatedData = generateQuestionsSchema.parse(body);
+
+		// Only PRO users can select difficulty - ignore for free users
+		if (validatedData.difficulty && !isProOrAbove(userRole)) {
+			validatedData.difficulty = undefined;
+		}
 
 		// Fetch source content
 		const sourcesData = await db
@@ -327,6 +341,8 @@ Generate exactly ${validatedData.count} questions.`;
 					aiModel: "claude-sonnet-4-20250514",
 					aiTokensUsed:
 						message.usage.input_tokens + message.usage.output_tokens,
+					aiInputTokens: message.usage.input_tokens,
+					aiOutputTokens: message.usage.output_tokens,
 					explanation: q.explanation,
 					timesAnswered: 0,
 					correctAnswerRate: 0,
@@ -386,6 +402,8 @@ Generate exactly ${validatedData.count} questions.`;
 			{
 				questions: savedQuestions,
 				tokensUsed: message.usage.input_tokens + message.usage.output_tokens,
+				inputTokens: message.usage.input_tokens,
+				outputTokens: message.usage.output_tokens,
 			},
 			{ status: 201 },
 		);

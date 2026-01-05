@@ -1,10 +1,13 @@
 import { eq } from "drizzle-orm";
 import { type NextRequest, NextResponse } from "next/server";
+import {
+	getGenerationLimit,
+	isProOrAbove,
+	type UserRole,
+} from "@/lib/constants/generation-limits";
 import { auth } from "@/server/better-auth/config";
 import { db } from "@/server/db";
 import { user } from "@/server/db/schema";
-
-const DAILY_GENERATION_LIMIT = 2;
 
 // GET /api/user/generation-status - Get user's generation status
 export async function GET(request: NextRequest) {
@@ -21,6 +24,7 @@ export async function GET(request: NextRequest) {
 			.select({
 				dailyGenerationCount: user.dailyGenerationCount,
 				lastGenerationDate: user.lastGenerationDate,
+				role: user.role,
 			})
 			.from(user)
 			.where(eq(user.id, session.user.id));
@@ -45,10 +49,11 @@ export async function GET(request: NextRequest) {
 
 		const isNewDay = !lastGenDay || lastGenDay.getTime() < today.getTime();
 		const currentCount = isNewDay ? 0 : userData.dailyGenerationCount;
-		const remainingGenerations = Math.max(
-			0,
-			DAILY_GENERATION_LIMIT - currentCount,
-		);
+
+		// Get dynamic limit based on user role
+		const userRole = (userData.role ?? "free") as UserRole;
+		const dailyLimit = getGenerationLimit(userRole);
+		const remainingGenerations = Math.max(0, dailyLimit - currentCount);
 
 		// Calculate reset time (midnight tonight)
 		const tomorrow = new Date(today);
@@ -56,9 +61,12 @@ export async function GET(request: NextRequest) {
 
 		return NextResponse.json({
 			remainingGenerations,
-			dailyLimit: DAILY_GENERATION_LIMIT,
+			dailyLimit,
 			usedToday: currentCount,
 			resetsAt: tomorrow.toISOString(),
+			role: userRole,
+			isPro: isProOrAbove(userRole),
+			canSelectDifficulty: isProOrAbove(userRole),
 		});
 	} catch (error) {
 		console.error("Error fetching generation status:", error);
