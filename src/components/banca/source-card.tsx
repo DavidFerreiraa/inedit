@@ -96,7 +96,7 @@ export function SourceCard({ source, bancaId, onDelete }: SourceCardProps) {
 				<div className="flex items-start justify-between gap-2">
 					<h3 className="truncate font-medium text-sm">{source.title}</h3>
 					<Button
-						className="size-8 shrink-0 opacity-0 transition-opacity group-hover:opacity-100"
+						className="size-8 shrink-0 transition-opacity group-hover:opacity-100"
 						disabled={isDeleting}
 						onClick={handleDelete}
 						size="icon"

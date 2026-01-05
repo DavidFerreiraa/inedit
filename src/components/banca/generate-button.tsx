@@ -1,22 +1,16 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { AlertCircle, Sparkles } from "lucide-react";
+import { AlertCircle, Crown, Sparkles } from "lucide-react";
+import Link from "next/link";
 import { type ButtonHTMLAttributes, forwardRef } from "react";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 interface GenerateButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 	isLoading?: boolean;
-	remainingGenerations?: number;
-	resetsAt?: string | null;
-}
-
-function formatResetTime(resetsAt: string): string {
-	const resetDate = new Date(resetsAt);
-	return resetDate.toLocaleTimeString([], {
-		hour: "2-digit",
-		minute: "2-digit",
-	});
+	remainingCredits?: number;
+	canUpgrade?: boolean;
 }
 
 export const GenerateButton = forwardRef<
@@ -27,22 +21,22 @@ export const GenerateButton = forwardRef<
 		{
 			className,
 			isLoading = false,
-			remainingGenerations,
-			resetsAt,
+			remainingCredits,
+			canUpgrade,
 			children,
 			onClick,
 			disabled,
 		},
 		ref,
 	) => {
-		const isLimitReached =
-			remainingGenerations !== undefined && remainingGenerations <= 0;
-		const isDisabled = disabled || isLoading || isLimitReached;
+		const isOutOfCredits =
+			remainingCredits !== undefined && remainingCredits <= 0;
+		const isDisabled = disabled || isLoading || isOutOfCredits;
 
-		// If limit is reached, show limit notice
-		if (isLimitReached && resetsAt) {
+		// If out of credits, show upgrade prompt
+		if (isOutOfCredits) {
 			return (
-				<div className={cn("flex flex-col gap-2", className)}>
+				<div className={cn("flex flex-col gap-3", className)}>
 					<motion.div
 						animate={{ opacity: 1 }}
 						className="flex items-center justify-center gap-2 rounded-2xl border border-amber-500/30 bg-amber-500/10 px-6 py-4 text-amber-600 dark:text-amber-400"
@@ -50,9 +44,17 @@ export const GenerateButton = forwardRef<
 					>
 						<AlertCircle className="size-5" />
 						<span className="font-medium text-sm">
-							Daily limit reached. Resets at {formatResetTime(resetsAt)}
+							You've used all your credits
 						</span>
 					</motion.div>
+					{canUpgrade && (
+						<Link className="w-full" href="/pricing">
+							<Button className="w-full gap-2" variant="outline">
+								<Crown className="size-4" />
+								Upgrade to Pro for more credits
+							</Button>
+						</Link>
+					)}
 				</div>
 			);
 		}
@@ -136,10 +138,10 @@ export const GenerateButton = forwardRef<
 						)}
 					</span>
 				</motion.button>
-				{remainingGenerations !== undefined && remainingGenerations > 0 && (
+				{remainingCredits !== undefined && remainingCredits > 0 && (
 					<p className="text-center text-muted-foreground text-xs">
-						{remainingGenerations} generation
-						{remainingGenerations !== 1 ? "s" : ""} remaining today
+						{remainingCredits} credit{remainingCredits !== 1 ? "s" : ""}{" "}
+						remaining
 					</p>
 				)}
 			</div>

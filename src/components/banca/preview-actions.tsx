@@ -27,7 +27,12 @@ export function PreviewActions({
 	return (
 		<>
 			<div className="flex gap-3 border-t pt-4">
-				<Button className="flex-1" disabled={isLoading} onClick={onSave}>
+				<Button
+					className="flex-1"
+					disabled={isLoading}
+					variant="outline"
+					onClick={onSave}
+				>
 					{isLoading ? "Salvando..." : "Salvar Questões"}
 				</Button>
 				<Button

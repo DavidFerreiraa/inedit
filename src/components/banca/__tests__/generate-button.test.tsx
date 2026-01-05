@@ -63,65 +63,50 @@ describe("GenerateButton", () => {
 		});
 	});
 
-	describe("Generation limit", () => {
-		it("shows limit reached alert when remainingGenerations is 0", () => {
-			const resetTime = new Date(Date.now() + 60 * 60 * 1000).toISOString();
-
+	describe("Credit limit", () => {
+		it("shows out of credits alert when remainingCredits is 0", () => {
 			render(
-				<GenerateButton remainingGenerations={0} resetsAt={resetTime}>
-					Generate
-				</GenerateButton>,
-			);
-
-			expect(screen.queryByRole("button")).not.toBeInTheDocument();
-			expect(screen.getByText(/Daily limit reached/)).toBeInTheDocument();
-		});
-
-		it("formats reset time correctly in limit alert", () => {
-			const resetDate = new Date();
-			resetDate.setHours(14, 30, 0, 0);
-
-			render(
-				<GenerateButton
-					remainingGenerations={0}
-					resetsAt={resetDate.toISOString()}
-				>
-					Generate
-				</GenerateButton>,
-			);
-
-			// Should show the formatted time
-			expect(screen.getByText(/Resets at/)).toBeInTheDocument();
-		});
-
-		it("shows generation counter when remainingGenerations is greater than 0", () => {
-			render(
-				<GenerateButton remainingGenerations={2} resetsAt={null}>
+				<GenerateButton canUpgrade remainingCredits={0}>
 					Generate
 				</GenerateButton>,
 			);
 
 			expect(
-				screen.getByText("2 generations remaining today"),
+				screen.queryByRole("button", { name: /Generate/ }),
+			).not.toBeInTheDocument();
+			expect(
+				screen.getByText(/You've used all your credits/),
 			).toBeInTheDocument();
 		});
 
-		it("pluralizes generation correctly for 1 remaining", () => {
+		it("shows upgrade prompt when canUpgrade is true and out of credits", () => {
 			render(
-				<GenerateButton remainingGenerations={1} resetsAt={null}>
+				<GenerateButton canUpgrade remainingCredits={0}>
 					Generate
 				</GenerateButton>,
 			);
 
 			expect(
-				screen.getByText("1 generation remaining today"),
+				screen.getByText(/Upgrade to Pro for more credits/),
 			).toBeInTheDocument();
 		});
 
-		it("does not show counter when remainingGenerations is undefined", () => {
+		it("shows credit counter when remainingCredits is greater than 0", () => {
+			render(<GenerateButton remainingCredits={2}>Generate</GenerateButton>);
+
+			expect(screen.getByText("2 credits remaining")).toBeInTheDocument();
+		});
+
+		it("pluralizes credit correctly for 1 remaining", () => {
+			render(<GenerateButton remainingCredits={1}>Generate</GenerateButton>);
+
+			expect(screen.getByText("1 credit remaining")).toBeInTheDocument();
+		});
+
+		it("does not show counter when remainingCredits is undefined", () => {
 			render(<GenerateButton>Generate</GenerateButton>);
 
-			expect(screen.queryByText(/remaining today/)).not.toBeInTheDocument();
+			expect(screen.queryByText(/remaining/)).not.toBeInTheDocument();
 		});
 	});
 
@@ -152,22 +137,19 @@ describe("GenerateButton", () => {
 			expect(handleClick).not.toHaveBeenCalled();
 		});
 
-		it("does not call onClick when limit is reached", async () => {
+		it("does not call onClick when out of credits", async () => {
 			const handleClick = vi.fn();
-			const resetTime = new Date(Date.now() + 60 * 60 * 1000).toISOString();
 
 			render(
-				<GenerateButton
-					onClick={handleClick}
-					remainingGenerations={0}
-					resetsAt={resetTime}
-				>
+				<GenerateButton canUpgrade onClick={handleClick} remainingCredits={0}>
 					Generate
 				</GenerateButton>,
 			);
 
-			// Button should not be present, so nothing to click
-			expect(screen.queryByRole("button")).not.toBeInTheDocument();
+			// Generate button should not be present, so nothing to click
+			expect(
+				screen.queryByRole("button", { name: /Generate/ }),
+			).not.toBeInTheDocument();
 			expect(handleClick).not.toHaveBeenCalled();
 		});
 	});
@@ -179,18 +161,16 @@ describe("GenerateButton", () => {
 			expect(screen.getByRole("button")).toBeDisabled();
 		});
 
-		it("shows button with remaining generations when not at limit", () => {
+		it("shows button with remaining credits when not at limit", () => {
 			render(
-				<GenerateButton remainingGenerations={1} resetsAt={null}>
+				<GenerateButton remainingCredits={1}>
 					Generate Questions
 				</GenerateButton>,
 			);
 
 			expect(screen.getByRole("button")).toBeInTheDocument();
 			expect(screen.getByText("Generate Questions")).toBeInTheDocument();
-			expect(
-				screen.getByText("1 generation remaining today"),
-			).toBeInTheDocument();
+			expect(screen.getByText("1 credit remaining")).toBeInTheDocument();
 		});
 	});
 });

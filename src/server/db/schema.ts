@@ -51,9 +51,9 @@ export const user = createTable("user", {
 	updatedAt: timestamp("updated_at")
 		.$defaultFn(() => /* @__PURE__ */ new Date())
 		.notNull(),
-	// Generation limit tracking (2 per day)
-	dailyGenerationCount: integer("daily_generation_count").default(0).notNull(),
-	lastGenerationDate: timestamp("last_generation_date", { withTimezone: true }),
+	// Credits system - total lifetime credits (not daily)
+	creditsUsed: integer("credits_used").default(0).notNull(),
+	creditsGranted: integer("credits_granted"), // null = use role default, allows admin override
 });
 
 export const session = createTable("session", {

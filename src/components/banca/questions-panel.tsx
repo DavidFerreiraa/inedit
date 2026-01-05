@@ -68,6 +68,7 @@ interface Question {
 
 interface QuestionsResponse {
 	questions: Question[];
+	count?: number;
 }
 
 interface QuestionsPanelProps {
@@ -143,6 +144,9 @@ export function QuestionsPanel({
 	const questions = previewMode
 		? (draftData?.questions ?? [])
 		: (publishedData?.questions ?? []);
+	const questionsCount = previewMode
+		? (draftData?.count ?? draftData?.questions?.length ?? 0)
+		: (publishedData?.count ?? publishedData?.questions?.length ?? 0);
 	const isLoading = previewMode ? draftLoading : publishedLoading;
 	const error = previewMode ? draftError : publishedError;
 
@@ -364,7 +368,7 @@ export function QuestionsPanel({
 				{!previewMode && questions.length > 0 && (
 					<Link href={`/banca/${bancaId}/all-questions`}>
 						<Button size="sm" variant="ghost">
-							Ver todas ({questions.length})
+							Ver todas ({questionsCount})
 						</Button>
 					</Link>
 				)}
@@ -376,7 +380,7 @@ export function QuestionsPanel({
 					<PreviewBanner />
 					<div className="space-y-4">
 						{questions.map((q) => (
-							<Card className="p-4" key={q.id}>
+							<Card className="p-4 overflow-hidden" key={q.id}>
 								<div className="space-y-2">
 									<div className="flex gap-2">
 										<Badge className={difficultyColors[q.difficulty]}>

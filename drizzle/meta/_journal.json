@@ -8,6 +8,13 @@
 			"when": 1767230030234,
 			"tag": "0000_dashing_warstar",
 			"breakpoints": true
+		},
+		{
+			"idx": 1,
+			"version": "7",
+			"when": 1767634363376,
+			"tag": "0001_clammy_angel",
+			"breakpoints": true
 		}
 	]
 }

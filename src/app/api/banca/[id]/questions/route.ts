@@ -1,11 +1,12 @@
 import Anthropic from "@anthropic-ai/sdk";
 import type { InferInsertModel } from "drizzle-orm";
-import { and, desc, eq, inArray } from "drizzle-orm";
+import { and, count, desc, eq, inArray } from "drizzle-orm";
 import { type NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { env } from "@/env";
 import {
 	getGenerationLimit,
+	getRemainingCredits,
 	isProOrAbove,
 	type UserRole,
 } from "@/lib/constants/generation-limits";
@@ -98,7 +99,15 @@ export async function GET(
 			);
 		}
 
-		// Execute query
+		// Get total count of questions matching the filters (before limit/offset)
+		const countResult = await db
+			.select({ count: count() })
+			.from(questions)
+			.where(and(...conditions));
+
+		const totalCount = countResult[0]?.count ?? 0;
+
+		// Execute paginated query
 		const userQuestions = await db
 			.select()
 			.from(questions)
@@ -150,7 +159,10 @@ export async function GET(
 			}),
 		);
 
-		return NextResponse.json({ questions: questionsWithOptions });
+		return NextResponse.json({
+			questions: questionsWithOptions,
+			count: totalCount,
+		});
 	} catch (error) {
 		console.error("Error fetching questions:", error);
 		return NextResponse.json(
@@ -176,11 +188,11 @@ export async function POST(
 
 		const { id: bancaId } = await params;
 
-		// Check generation limit based on user role
+		// Check credit limit based on user role
 		const [userData] = await db
 			.select({
-				dailyGenerationCount: user.dailyGenerationCount,
-				lastGenerationDate: user.lastGenerationDate,
+				creditsUsed: user.creditsUsed,
+				creditsGranted: user.creditsGranted,
 				role: user.role,
 			})
 			.from(user)
@@ -190,37 +202,23 @@ export async function POST(
 			return NextResponse.json({ error: "User not found" }, { status: 404 });
 		}
 
-		// Check if we need to reset the count (new day)
-		const now = new Date();
-		const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-		const lastGenDate = userData.lastGenerationDate
-			? new Date(userData.lastGenerationDate)
-			: null;
-		const lastGenDay = lastGenDate
-			? new Date(
-					lastGenDate.getFullYear(),
-					lastGenDate.getMonth(),
-					lastGenDate.getDate(),
-				)
-			: null;
-
-		const isNewDay = !lastGenDay || lastGenDay.getTime() < today.getTime();
-		const currentCount = isNewDay ? 0 : userData.dailyGenerationCount;
-
-		// Get dynamic limit based on user role
+		// Get user role and check credits
 		const userRole = (userData.role ?? "free") as UserRole;
-		const dailyGenerationLimit = getGenerationLimit(userRole);
+		const creditLimit = userData.creditsGranted ?? getGenerationLimit(userRole);
+		const remainingCredits = getRemainingCredits(
+			userRole,
+			userData.creditsUsed,
+			userData.creditsGranted,
+		);
 
-		if (currentCount >= dailyGenerationLimit) {
-			// Calculate reset time (midnight tonight)
-			const tomorrow = new Date(today);
-			tomorrow.setDate(tomorrow.getDate() + 1);
-
+		if (remainingCredits <= 0) {
 			return NextResponse.json(
 				{
-					error: "Daily generation limit reached",
-					remainingGenerations: 0,
-					resetsAt: tomorrow.toISOString(),
+					error: "No credits remaining",
+					remainingCredits: 0,
+					creditLimit,
+					creditsUsed: userData.creditsUsed,
+					canUpgrade: userRole === "free",
 				},
 				{ status: 429 },
 			);
@@ -388,13 +386,11 @@ Generate exactly ${validatedData.count} questions.`;
 			}),
 		);
 
-		// Update user's generation count
-		const newCount = isNewDay ? 1 : currentCount + 1;
+		// Update user's credits used
 		await db
 			.update(user)
 			.set({
-				dailyGenerationCount: newCount,
-				lastGenerationDate: now,
+				creditsUsed: userData.creditsUsed + 1,
 			})
 			.where(eq(user.id, session.user.id));
 

@@ -35,7 +35,7 @@ export function DifficultySelector({
 	const isLocked = !isPro;
 
 	return (
-		<div data-testid="difficulty-selector" className="space-y-2">
+		<div className="space-y-2" data-testid="difficulty-selector">
 			<div className="flex items-center gap-2">
 				<span className="font-medium text-sm">Dificuldade</span>
 				{isLocked && <ProBadge />}

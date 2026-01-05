@@ -22,13 +22,13 @@ interface Source {
 	createdAt: Date;
 }
 
-interface GenerationStatus {
-	remainingGenerations: number;
-	dailyLimit: number;
-	usedToday: number;
-	resetsAt: string;
+interface CreditStatus {
+	remainingCredits: number;
+	creditLimit: number;
+	creditsUsed: number;
 	isPro: boolean;
 	canSelectDifficulty: boolean;
+	canUpgrade: boolean;
 }
 
 interface SourcesPanelProps {
@@ -48,22 +48,21 @@ export function SourcesPanel({
 	const [selectedSource, setSelectedSource] = useState<
 		"upload" | "url" | "text"
 	>("upload");
-	const [generationStatus, setGenerationStatus] =
-		useState<GenerationStatus | null>(null);
+	const [creditStatus, setCreditStatus] = useState<CreditStatus | null>(null);
 	const [selectedDifficulty, setSelectedDifficulty] = useState<
 		Difficulty | undefined
 	>(undefined);
 
-	// Fetch generation status
-	const fetchGenerationStatus = useCallback(async () => {
+	// Fetch credit status
+	const fetchCreditStatus = useCallback(async () => {
 		try {
 			const response = await fetch("/api/user/generation-status");
 			if (response.ok) {
 				const data = await response.json();
-				setGenerationStatus(data);
+				setCreditStatus(data);
 			}
 		} catch (error) {
-			console.error("Error fetching generation status:", error);
+			console.error("Error fetching credit status:", error);
 		}
 	}, []);
 
@@ -91,18 +90,18 @@ export function SourcesPanel({
 	// biome-ignore lint/correctness/useExhaustiveDependencies: fetchSources is stable
 	useEffect(() => {
 		fetchSources();
-		fetchGenerationStatus();
-	}, [bancaId, fetchGenerationStatus]);
+		fetchCreditStatus();
+	}, [bancaId, fetchCreditStatus]);
 
-	// Refetch generation status when generation completes
+	// Refetch credit status when generation completes
 	const [wasGenerating, setWasGenerating] = useState(false);
 	useEffect(() => {
 		if (wasGenerating && !isGenerating) {
 			// Generation just completed, refetch status
-			fetchGenerationStatus();
+			fetchCreditStatus();
 		}
 		setWasGenerating(isGenerating);
-	}, [isGenerating, wasGenerating, fetchGenerationStatus]);
+	}, [isGenerating, wasGenerating, fetchCreditStatus]);
 
 	const handleAddSuccess = () => {
 		fetchSources();
@@ -226,7 +225,7 @@ export function SourcesPanel({
 			<div className="border-t p-3 md:p-4">
 				<DifficultySelector
 					disabled={isGenerating}
-					isPro={generationStatus?.isPro ?? false}
+					isPro={creditStatus?.isPro ?? false}
 					onChange={setSelectedDifficulty}
 					value={selectedDifficulty}
 				/>
@@ -235,12 +234,12 @@ export function SourcesPanel({
 			{/* Generate Button */}
 			<div className="border-t p-3 md:p-4">
 				<GenerateButton
+					canUpgrade={creditStatus?.canUpgrade}
 					className="w-full"
 					disabled={completedSources.length === 0 || isGenerating}
 					isLoading={isGenerating}
 					onClick={handleGenerate}
-					remainingGenerations={generationStatus?.remainingGenerations}
-					resetsAt={generationStatus?.resetsAt}
+					remainingCredits={creditStatus?.remainingCredits}
 				>
 					<span className="hidden sm:inline">
 						{isGenerating

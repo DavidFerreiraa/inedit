@@ -3,9 +3,13 @@ import { render, screen } from "@/test/utils";
 
 // Mock Next.js Link
 vi.mock("next/link", () => ({
-	default: ({ children, href }: { children: React.ReactNode; href: string }) => (
-		<a href={href}>{children}</a>
-	),
+	default: ({
+		children,
+		href,
+	}: {
+		children: React.ReactNode;
+		href: string;
+	}) => <a href={href}>{children}</a>,
 }));
 
 // Mock auth server utilities
@@ -37,7 +41,7 @@ vi.mock("../user-dropdown", () => ({
 		session: unknown;
 		userRole: string;
 	}) => (
-		<div data-testid="user-dropdown" data-role={userRole}>
+		<div data-role={userRole} data-testid="user-dropdown">
 			User
 		</div>
 	),
