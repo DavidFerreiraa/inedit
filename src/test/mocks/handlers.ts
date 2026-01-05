@@ -1,11 +1,9 @@
 import { HttpResponse, http } from "msw";
+import { mockAllUsers, mockGenerationStatusFree } from "./roles";
 
-// Default mock data
+// Default mock data (free user)
 export const mockGenerationStatus = {
-	remainingGenerations: 2,
-	dailyLimit: 2,
-	usedToday: 0,
-	resetsAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+	...mockGenerationStatusFree,
 };
 
 export const mockSources = [
@@ -205,5 +203,28 @@ export const handlers = [
 	// Discard drafts
 	http.delete("/api/banca/:bancaId/questions/drafts", () => {
 		return HttpResponse.json({ success: true, deletedCount: 2 });
+	}),
+
+	// Admin: Get all users
+	http.get("/api/admin/users", () => {
+		return HttpResponse.json(mockAllUsers);
+	}),
+
+	// Admin: Update user role
+	http.patch("/api/admin/users/:id", async ({ request, params }) => {
+		const { id } = params;
+		const body = (await request.json()) as { role: string };
+
+		const user = mockAllUsers.find((u) => u.id === id);
+		if (!user) {
+			return HttpResponse.json({ error: "User not found" }, { status: 404 });
+		}
+
+		return HttpResponse.json({
+			id: user.id,
+			name: user.name,
+			email: user.email,
+			role: body.role,
+		});
 	}),
 ];
