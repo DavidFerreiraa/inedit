@@ -1,9 +1,10 @@
 "use client";
 
-import { FileText, LogOut } from "lucide-react";
+import { FileText, LogOut, Settings } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -12,13 +13,16 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { ProBadge } from "@/components/ui/pro-badge";
+import type { UserRole } from "@/lib/constants/generation-limits";
 import { authClient, type Session } from "@/server/better-auth/client";
 
 interface UserDropdownProps {
 	session: Session;
+	userRole?: UserRole;
 }
 
-export function UserDropdown({ session }: UserDropdownProps) {
+export function UserDropdown({ session, userRole }: UserDropdownProps) {
 	const [isLoading, setIsLoading] = useState(false);
 	const router = useRouter();
 
@@ -65,7 +69,28 @@ export function UserDropdown({ session }: UserDropdownProps) {
 			>
 				<DropdownMenuLabel>
 					<div className="flex flex-col space-y-1">
-						<p className="font-medium text-sm">{session.user.name ?? "User"}</p>
+						<div className="flex items-center gap-2">
+							<p className="font-medium text-sm">
+								{session.user.name ?? "User"}
+							</p>
+							{userRole === "admin" && (
+								<Badge
+									className="px-1.5 py-0.5 text-[10px]"
+									variant="destructive"
+								>
+									Admin
+								</Badge>
+							)}
+							{userRole === "pro" && <ProBadge />}
+							{userRole === "free" && (
+								<Badge
+									className="px-1.5 py-0.5 text-[10px]"
+									variant="secondary"
+								>
+									Free
+								</Badge>
+							)}
+						</div>
 						<p className="text-muted-foreground text-xs">
 							{session.user.email}
 						</p>
@@ -76,6 +101,12 @@ export function UserDropdown({ session }: UserDropdownProps) {
 					<FileText className="mr-2 h-4 w-4" />
 					<span>Meus Inedits</span>
 				</DropdownMenuItem>
+				{userRole === "admin" && (
+					<DropdownMenuItem onClick={() => router.push("/admin/users")}>
+						<Settings className="mr-2 h-4 w-4" />
+						<span>Admin Panel</span>
+					</DropdownMenuItem>
+				)}
 				<DropdownMenuSeparator />
 				<DropdownMenuItem disabled={isLoading} onClick={handleSignOut}>
 					<LogOut className="mr-2 h-4 w-4" />
