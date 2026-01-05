@@ -12,6 +12,9 @@ import {
 
 export const createTable = pgTableCreator((name) => `pg-drizzle_${name}`);
 
+// User role enum for subscription tiers
+export const userRoleEnum = pgEnum("user_role", ["free", "pro", "admin"]);
+
 export const posts = createTable(
 	"post",
 	(d) => ({
@@ -41,6 +44,7 @@ export const user = createTable("user", {
 		.$defaultFn(() => false)
 		.notNull(),
 	image: text("image"),
+	role: userRoleEnum().default("free").notNull(),
 	createdAt: timestamp("created_at")
 		.$defaultFn(() => /* @__PURE__ */ new Date())
 		.notNull(),
@@ -250,7 +254,9 @@ export const questions = createTable(
 		aiModel: d
 			.varchar({ length: 100 })
 			.$defaultFn(() => "claude-sonnet-4-20250514"),
-		aiTokensUsed: d.integer(),
+		aiTokensUsed: d.integer(), // Total tokens (legacy, kept for compatibility)
+		aiInputTokens: d.integer(), // Input tokens for cost calculation
+		aiOutputTokens: d.integer(), // Output tokens for cost calculation
 
 		// Question explanation
 		explanation: d.text(), // Detailed explanation of the answer
