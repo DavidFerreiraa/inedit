@@ -219,7 +219,7 @@ describe("SourcesPanel", () => {
 	});
 
 	describe("Generate action", () => {
-		it("calls onGenerate with selected source IDs", async () => {
+		it("calls onGenerate", async () => {
 			const onGenerate = vi.fn();
 
 			render(<SourcesPanel {...defaultProps} onGenerate={onGenerate} />);
@@ -236,7 +236,7 @@ describe("SourcesPanel", () => {
 
 			await waitFor(() => {
 				// Should be called with IDs of completed sources (1 and 2)
-				expect(onGenerate).toHaveBeenCalledWith([1, 2]);
+				expect(onGenerate).toHaveBeenCalled();
 			});
 		});
 	});

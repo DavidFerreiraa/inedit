@@ -68,15 +68,17 @@ export function BancaPageClient({
 			sourceIds,
 			count = 5,
 			systemPrompt,
+			difficulty,
 		}: {
 			sourceIds: number[];
 			count?: number;
 			systemPrompt?: string;
+			difficulty?: string;
 		}) => {
 			const response = await fetch(`/api/banca/${bancaId}/questions`, {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ sourceIds, count, systemPrompt }),
+				body: JSON.stringify({ sourceIds, count, systemPrompt, difficulty }),
 			});
 
 			if (!response.ok) {
@@ -110,7 +112,7 @@ export function BancaPageClient({
 		},
 	});
 
-	const handleGenerate = async (sourceIds: number[]) => {
+	const handleGenerate = async (sourceIds: number[], difficulty?: string) => {
 		// Auto-save existing previews before generating new ones
 		if (previewQuestionIds.length > 0) {
 			try {
@@ -129,7 +131,12 @@ export function BancaPageClient({
 			Ensure questions are clear, unambiguous, and have definitive correct answers.
 			Keep the focus on the way that CEBRASPE formats their questions. Your return should be in brazilian portuguese.`;
 
-		generateQuestionsMutation.mutate({ sourceIds, count: 5, systemPrompt });
+		generateQuestionsMutation.mutate({
+			sourceIds,
+			count: 5,
+			systemPrompt,
+			difficulty,
+		});
 	};
 
 	return (
