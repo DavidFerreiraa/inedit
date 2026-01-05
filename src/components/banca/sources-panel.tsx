@@ -3,6 +3,7 @@
 import { Loader2 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { type Difficulty, DifficultySelector } from "./difficulty-selector";
 import { GenerateButton } from "./generate-button";
 import { SourceCard } from "./source-card";
 import { SourceSelectorDropdown } from "./source-selector-dropdown";
@@ -26,11 +27,13 @@ interface GenerationStatus {
 	dailyLimit: number;
 	usedToday: number;
 	resetsAt: string;
+	isPro: boolean;
+	canSelectDifficulty: boolean;
 }
 
 interface SourcesPanelProps {
 	bancaId: string;
-	onGenerate?: (sourceIds: number[]) => void;
+	onGenerate?: (sourceIds: number[], difficulty?: Difficulty) => void;
 	isGenerating?: boolean;
 }
 
@@ -47,6 +50,9 @@ export function SourcesPanel({
 	>("upload");
 	const [generationStatus, setGenerationStatus] =
 		useState<GenerationStatus | null>(null);
+	const [selectedDifficulty, setSelectedDifficulty] = useState<
+		Difficulty | undefined
+	>(undefined);
 
 	// Fetch generation status
 	const fetchGenerationStatus = useCallback(async () => {
@@ -111,7 +117,7 @@ export function SourcesPanel({
 			alert("Please select at least one source");
 			return;
 		}
-		onGenerate?.(selectedSourceIds);
+		onGenerate?.(selectedSourceIds, selectedDifficulty);
 	};
 
 	const completedSources = sources.filter(
@@ -214,6 +220,16 @@ export function SourcesPanel({
 						))
 					)}
 				</div>
+			</div>
+
+			{/* Difficulty Selector */}
+			<div className="border-t p-3 md:p-4">
+				<DifficultySelector
+					disabled={isGenerating}
+					isPro={generationStatus?.isPro ?? false}
+					onChange={setSelectedDifficulty}
+					value={selectedDifficulty}
+				/>
 			</div>
 
 			{/* Generate Button */}

@@ -43,7 +43,7 @@ export function PreviewActions({
 				onOpenChange={setShowDiscardConfirm}
 				open={showDiscardConfirm}
 			>
-				<AlertDialogContent>
+				<AlertDialogContent className="bg-zinc-100 dark:bg-zinc-900">
 					<AlertDialogHeader>
 						<AlertDialogTitle>Descartar questões?</AlertDialogTitle>
 						<AlertDialogDescription>

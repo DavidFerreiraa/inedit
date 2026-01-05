@@ -54,6 +54,8 @@ interface Question {
 	aiPrompt: string | null;
 	aiModel: string | null;
 	aiTokensUsed: number | null;
+	aiInputTokens: number | null;
+	aiOutputTokens: number | null;
 	explanation: string | null;
 	timesAnswered: number;
 	correctAnswerRate: number;
@@ -145,6 +147,33 @@ export function QuestionsPanel({
 	const error = previewMode ? draftError : publishedError;
 
 	const currentQuestion = questions[currentQuestionIndex];
+
+	// Calculate tokens and cost for all questions
+	const totalInputTokens = questions.reduce(
+		(sum, q) => sum + (q.aiInputTokens ?? 0),
+		0,
+	);
+	const totalOutputTokens = questions.reduce(
+		(sum, q) => sum + (q.aiOutputTokens ?? 0),
+		0,
+	);
+	const totalTokensUsed = totalInputTokens + totalOutputTokens;
+
+	// Claude Sonnet 4 pricing: $3/1M input, $15/1M output
+	const inputCost = (totalInputTokens / 1_000_000) * 3;
+	const outputCost = (totalOutputTokens / 1_000_000) * 15;
+	const totalCost = inputCost + outputCost;
+
+	console.log("Token Usage:", {
+		inputTokens: totalInputTokens,
+		outputTokens: totalOutputTokens,
+		totalTokens: totalTokensUsed,
+		cost: {
+			input: `$${inputCost.toFixed(4)}`,
+			output: `$${outputCost.toFixed(4)}`,
+			total: `$${totalCost.toFixed(4)}`,
+		},
+	});
 
 	// Track answered questions
 	const answeredQuestions = new Set<number>();
@@ -246,13 +275,6 @@ export function QuestionsPanel({
 			setCurrentQuestionIndex(currentQuestionIndex + 1);
 		}
 	};
-
-	// Reset question index if it exceeds available questions
-	useEffect(() => {
-		if (questions.length > 0 && currentQuestionIndex >= questions.length) {
-			setCurrentQuestionIndex(0);
-		}
-	}, [questions.length, currentQuestionIndex, setCurrentQuestionIndex]);
 
 	// Navigate to specific question when questionId is provided
 	useEffect(() => {
